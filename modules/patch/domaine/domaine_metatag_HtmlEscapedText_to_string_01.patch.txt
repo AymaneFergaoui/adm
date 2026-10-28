@@ -1,0 +1,24 @@
+commit 712d677eaa18a3bf09b68299808ec714c2953e72
+Author: Tamás Brückner <tamas.bruckner@integralvision.hu>
+Date:   Fri May 12 12:21:48 2017 +0200
+
+    HtmlEscapedText object to string.
+
+diff --git a/core/lib/Drupal/Component/Render/HtmlEscapedText.php b/core/lib/Drupal/Component/Render/HtmlEscapedText.php
+index b286f57..9d016e4 100644
+--- a/core/lib/Drupal/Component/Render/HtmlEscapedText.php
++++ b/core/lib/Drupal/Component/Render/HtmlEscapedText.php
+@@ -29,6 +29,13 @@ class HtmlEscapedText implements MarkupInterface, \Countable {
+    *   The string to escape. This value will be cast to a string.
+    */
+   public function __construct($string) {
++    if (
++      is_object($string)
++      && method_exists($string, 'toString')
++    ) {
++      $string = $string->toString();
++    }
++
+     $this->string = (string) $string;
+   }
+ 

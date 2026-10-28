@@ -1,0 +1,11 @@
+entity.donation.add_form:
+  route_name: entity.donation.add_page
+  title: 'Add Donation'
+  appears_on:
+    - entity.donation.collection
+# Hide the Add Donation Type action
+# entity.donation_type.add_form:
+#   route_name: entity.donation_type.add_form
+#   title: 'Add Donation type'
+#   appears_on:
+#     - entity.donation_type.collection

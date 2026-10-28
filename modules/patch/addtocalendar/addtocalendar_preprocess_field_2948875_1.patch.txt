@@ -1,0 +1,14 @@
+diff --git a/includes/addtocalendar.build.inc b/includes/addtocalendar.build.inc
+index 388d6ea..a508988 100644
+--- a/includes/addtocalendar.build.inc
++++ b/includes/addtocalendar.build.inc
+@@ -97,7 +97,8 @@ function _addtocalendar_preprocess_field(&$variables) {
+                 $class_value = strip_tags($entity->{$field}->end_value);
+               }
+               else {
+-                $class_value = strip_tags(render($entity->get($field)->view(['label' => 'hidden'])));
++                $field_value = $entity->get($field)->view(['label' => 'hidden']);
++                $class_value = strip_tags(render($field_value));
+               }
+               break;
+           }

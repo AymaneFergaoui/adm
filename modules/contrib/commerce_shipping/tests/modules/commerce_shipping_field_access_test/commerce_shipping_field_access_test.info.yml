@@ -1,0 +1,11 @@
+name: Commerce Shipping Field Access Test
+type: module
+description: Adds a restricted shipment field, as other modules do.
+package: Testing
+dependencies:
+  - commerce_shipping:commerce_shipping
+
+# Information added by Drupal.org packaging script on 2026-10-28
+version: '8.x-2.16'
+project: 'commerce_shipping'
+datestamp: 1793192377

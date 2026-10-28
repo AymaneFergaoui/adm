@@ -1,0 +1,12 @@
+donation.donation_type.*:
+  type: config_entity
+  label: 'Donation type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string

@@ -1,0 +1,12 @@
+name: Term Page Access By Domain
+type: module
+description: 'Expose Specific Term only to Specific Domain'
+package: Domain [ATOZ]
+
+dependencies:
+  - domain  
+  - drupal:taxonomy
+  - 'drupal:system (>= 8.5)'
+
+version: '8.x-0.1'
+core_version_requirement: ^8 || ^9 || ^10

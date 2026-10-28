@@ -1,0 +1,31 @@
+{
+  "name": "drupal/parallax_bg",
+  "description": "Create a Parallax Background effect on any tagged element.",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "keywords": ["Drupal"],
+  "homepage": "https://www.drupal.org/project/parallax_bg",
+  "authors": [
+    {
+      "name": "Alberto Siles (hatuhay)",
+      "homepage": "https://www.drupal.org/u/hatuhay",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Sándor Juhász (lonalore)",
+      "homepage": "https://www.drupal.org/u/lonalore",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Viktor Holovachek (AstonVictor)",
+      "homepage": "https://www.drupal.org/u/astonvictor",
+      "role": "Maintainer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/parallax_bg",
+    "source": "https://git.drupalcode.org/project/parallax_bg"
+  },
+  "require": {  }
+}

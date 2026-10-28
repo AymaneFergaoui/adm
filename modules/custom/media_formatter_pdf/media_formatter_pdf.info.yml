@@ -1,0 +1,12 @@
+name: Media Formatter Embeded PDF 
+description: 'To embed PDF without other Third party module'
+package: Media [ATOZ]
+
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+
+dependencies:
+- drupal:media
+
+tags:
+ - developer

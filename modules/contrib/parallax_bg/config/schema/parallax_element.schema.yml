@@ -1,0 +1,21 @@
+parallax_bg.parallax_element.*:
+  type: config_entity
+  label: 'Parallax element config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    uuid:
+      type: string
+    label:
+      type: string
+      label: 'Selector'
+    description:
+      type: string
+      label: 'Description'
+    position:
+      type: string
+      label: 'Position'
+    speed:
+      type: float
+      label: 'Speed'

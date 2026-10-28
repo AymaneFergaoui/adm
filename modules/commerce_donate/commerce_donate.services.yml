@@ -1,0 +1,6 @@
+services:
+  commerce_donate.order_processor:
+    class: Drupal\commerce_donate\DonateOrderProcessor
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency','@current_user', '@current_route_match']
+    tags:
+    - { name: commerce_order.order_processor, priority: 1001 }

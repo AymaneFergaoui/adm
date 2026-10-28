@@ -1,0 +1,24 @@
+{
+  "name": "drupal/role_expire",
+  "description": "Enables user roles to expire on given time and day.",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Roger Codina (rcodina)",
+      "homepage": "https://www.drupal.org/u/rcodina",
+      "role": "Maintainer"
+    }
+  ],
+  "homepage": "https://drupal.org/project/role_expire",
+  "support": {
+    "issues": "https://drupal.org/project/issues/role_expire",
+    "source": "https://git.drupalcode.org/project/role_expire"
+  },
+  "require-dev": {
+    "drupal/rules": "*"
+  },
+  "suggest": {
+      "drupal/rules": "Required for role_expire_rules submodule"
+  }
+}

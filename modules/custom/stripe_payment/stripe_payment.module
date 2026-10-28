@@ -1,0 +1,16 @@
+<?php
+
+ /**
+ * Implements hook_theme() to register the template.
+ */
+function stripe_payment_theme($existing, $type, $theme, $path) {
+  return [
+    'stripe_payment_form' => [
+      'variables' => [
+        'stripe_publishable_key' => NULL,
+      ],
+      'template' => 'stripe-payment-form', // Name of the template file without .html.twig.
+      'path' => \Drupal::service('extension.list.module')->getPath('stripe_payment') . '/templates', // Path to the templates folder.
+    ],
+  ];
+}

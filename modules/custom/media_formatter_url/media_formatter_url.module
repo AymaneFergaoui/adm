@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function media_formatter_url_theme($existing, $type, $theme, $path) {
+
+  return [
+    'media_formatter_url_only_url' => [
+      'variables' => ['url' => NULL],
+    ],
+  ];
+}

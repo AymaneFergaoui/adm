@@ -1,0 +1,54 @@
+#card-element {
+	padding: 10px;
+    border: 1px solid #e1e5eb;
+    border-radius: 6px;
+	margin-bottom: 20px;
+}
+#stripe-donation-form {
+	background: white;
+    box-shadow: 0px 4px 10px rgb(0 0 0 / 10%);
+    padding: 20px;
+    margin: 0;
+    position: relative;
+    max-width: 450px;
+    text-align: left;
+    margin: 0 auto;
+    margin-top: 50px;	
+}
+#stripe-donation-form label {
+    font-size: 24px;
+    padding-bottom: 0px !important;
+    margin: 0;
+    font-weight: normal;
+}
+.donation_currency {
+    display: inline-block;
+    margin-left: 10px;
+}
+#stripe-donation-form #donate {
+    border: none;
+    height: 42px;
+    background: url(../images/addtocartbutton.png) no-repeat #2cab1c;
+    background-position: center left 20px;
+    box-shadow: none;
+    border-radius: 99px;
+    font-size: 12px;
+    color: white;
+    padding-left: 50px;
+    padding-right: 30px;
+    outline: none;
+    margin-right: 0px;
+	margin: 0 auto;
+}
+
+#stripe-donation-form .form-type-textarea {
+    margin-bottom: 24px;
+}
+
+#stripe-donation-form .form-type-textarea #message {
+    height: 80px;
+}
+
+.path-donate h1.title {
+    padding: 0 !important;
+}

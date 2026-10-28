@@ -1,0 +1,25 @@
+views.field.role_expire_date:
+  type: views.field.prerender_list
+  mapping:
+    date_format:
+      type: string
+      label: 'Date format'
+    custom_date_format:
+      type: string
+      label: 'Custom date format'
+    timezone:
+      type: string
+      label: 'Timezone'
+
+views.field.role_expire_expiry_data:
+  type: views.field.prerender_list
+  mapping:
+    custom_date_format:
+      type: string
+      label: 'Custom date format'
+    timezone:
+      type: string
+      label: 'Timezone'
+
+views.field.role_expire_rid:
+  type: views.field.prerender_list

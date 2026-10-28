@@ -1,0 +1,14 @@
+stripe_payment.payment_form:
+  path: '/stripe/payment-form'
+  defaults:
+    _controller: '\Drupal\stripe_payment\Controller\StripePaymentController::paymentForm'
+    _title: 'Stripe Payment'
+  requirements:
+    _permission: 'access content'
+
+stripe_payment.process_payment:
+  path: '/stripe/process-payment'
+  defaults:
+    _controller: '\Drupal\stripe_payment\Controller\StripePaymentController::processPayment'
+  requirements:
+    _permission: 'access content'

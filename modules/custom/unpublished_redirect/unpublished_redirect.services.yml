@@ -1,0 +1,6 @@
+services:
+  unpublished_redirect.subscriber:
+    class: Drupal\unpublished_redirect\EventSubscriber\UnpublishedRedirectSubscriber
+    arguments: ['@current_route_match']
+    tags:
+      - { name: event_subscriber }

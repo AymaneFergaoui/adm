@@ -1,0 +1,10 @@
+name: Role Expire
+description: "Enables user roles to expire on given time and day."
+type: module
+configure: role_expire.config
+core_version_requirement: ^10.2 || ^11
+
+# Information added by Drupal.org packaging script on 2024-10-31
+version: '4.1.1'
+project: 'role_expire'
+datestamp: 1730396660

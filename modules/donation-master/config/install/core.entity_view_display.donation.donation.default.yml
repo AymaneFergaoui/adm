@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - donation.donation_type.donation
+id: donation.donation.default
+targetEntityType: donation
+bundle: donation
+mode: default
+content:
+  name:
+    label: above
+    type: string
+    weight: -4
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden: {  }

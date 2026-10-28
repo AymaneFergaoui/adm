@@ -1,0 +1,38 @@
+name: Deploy Drupal 10 to Production FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    name: Upload changed files via FTP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync files to OVH FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          # Change to /www/ (or your FTP webroot folder on OVH)
+          server-dir: /www/
+          # Never overwrite or delete production settings or uploaded files on FTP
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            sites/default/files/**
+            sites/default/settings.php
+            sites/default/settings.local.php
+            *.sql
+            *.sql.gz
+            scratch/**
+            clear_cache_prod.php
+

@@ -1,0 +1,7 @@
+name: 'Node clone'
+description: 'Allows users to clone (copy then edit) an existing node.'
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+version: '8.x-1.x-dev'
+project: 'node_clone'
+datestamp: 1477009140

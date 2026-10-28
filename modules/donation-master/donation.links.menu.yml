@@ -1,0 +1,22 @@
+# Donation menu items under /admin/structure definition
+donation.structure:
+  title: 'Donations'
+  description: 'Administer Donation and Donation types.'
+  route_name: donation.structure
+  parent: system.admin_structure
+
+# Donation menu items under /admin/structure/donations definition
+entity.donation.collection:
+  title: 'Donation List'
+  route_name: entity.donation.collection
+  description: 'List Donation entities'
+  parent: donation.structure
+  weight: 100
+
+# Donation type menu items under /admin/structure/donations definition
+entity.donation_type.collection:
+  title: 'Donation Type'
+  route_name: entity.donation_type.collection
+  description: 'List Donation type (bundles)'
+  parent: donation.structure
+  weight: 99

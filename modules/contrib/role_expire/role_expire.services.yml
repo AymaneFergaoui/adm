@@ -1,0 +1,4 @@
+services:
+  role_expire.api:
+    class: Drupal\role_expire\RoleExpireApiService
+    arguments: ['@config.factory', '@database', '@session_manager', '@module_handler', '@datetime.time', '@current_user', '@logger.factory']

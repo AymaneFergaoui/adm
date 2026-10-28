@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_entity_type_alter().
+*/
+function term_access_by_domain_entity_type_alter(array &$entity_types) {
+  $entity_types['taxonomy_term']->setAccessClass('Drupal\\term_access_by_domain\\TABDControlHandler');
+}
+
+	 
+?>

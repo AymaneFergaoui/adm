@@ -1,0 +1,12 @@
+name: File Field Formatter Embeded PDF
+description: 'To embed PDF without other Third party module'
+package: FIELD TYPES [ATOZ]
+
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+
+dependencies:
+- drupal:field
+
+tags:
+ - developer

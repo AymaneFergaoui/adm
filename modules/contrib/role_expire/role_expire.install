@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * @file
+ * Role expire install.
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_schema().
+ */
+function role_expire_schema(): array {
+  $schema = [];
+
+  $schema['role_expire'] = [
+    'description' => 'Expiration time for the user roles.',
+    'fields' => [
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'User ID connected with expiration time.',
+      ],
+      'rid' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 128,
+        'description' => 'The role ID assigned to the user.',
+      ],
+      'expiry_timestamp' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Role expiration timestamp.',
+      ],
+    ],
+    'primary key' => ['uid', 'rid'],
+  ];
+  // Moved to configuration since 8.x-1.5.
+  /*$schema['role_expire_length'] = array(
+  'description' => 'Length in days to assign each role by default.',
+  'fields' => array(
+  'rid' => array(
+  'type' => 'varchar',
+  'not null' => TRUE,
+  'length' => 128,
+  'description' => 'The role ID assigned to the user.',
+  ),
+  'duration' => array(
+  'type' => 'text',
+  'size' => 'small',
+  'not null' => TRUE,
+  'description' => 'A strtotime-compatible default duration string.'
+  ),
+  ),
+  'primary key' => array('rid'),
+  );*/
+  return $schema;
+}
+
+/**
+ * Update schema for length table. Convert integer days to text "# days".
+ */
+function role_expire_update_8101(): void {
+  $connection = Database::getConnection();
+
+  // Fetch out all the current durations.
+  $result = $connection->query('SELECT rid,duration FROM {role_expire_length}');
+  $durations = [];
+  while ($row = $result->fetchObject()) {
+    $durations[$row->rid] = $row->duration;
+  }
+
+  // Convert the original duration column from type int to type text.
+  $field = [
+    'type' => 'text',
+    'size' => 'small',
+    'not null' => TRUE,
+    'description' => t('A strtotime-compatible default duration string.'),
+  ];
+  $connection->schema()->changeField('role_expire_length', 'duration', 'duration', $field);
+
+  // Append "days" since that's all it could've been before this revision.
+  if (!empty($durations)) {
+    foreach ($durations as $rid => $duration) {
+      $connection->update('role_expire_length')
+        ->fields(['duration' => "$duration days"])
+        ->condition('rid', $rid)
+        ->execute();
+    }
+  }
+}
+
+/**
+ * Migrate default durations table to configuration.
+ */
+function role_expire_update_8102(): void {
+  $connection = Database::getConnection();
+
+  // Fetch out all the current durations.
+  $result = $connection->query('SELECT rid,duration FROM {role_expire_length}');
+  $durations = [];
+  while ($row = $result->fetchObject()) {
+    $durations[$row->rid] = $row->duration;
+  }
+
+  // Save current configuration.
+  if (!empty($durations)) {
+    \Drupal::configFactory()
+      ->getEditable('role_expire.config')
+      ->set('role_expire_default_duration_roles', $durations)
+      ->save();
+  }
+
+  // Drop current database table.
+  $connection->schema()->dropTable('role_expire_length');
+}
+
+/**
+ * Automatically assign new roles to users with administer role expire role.
+ */
+function role_expire_update_8201(&$sandbox): void {
+  // Necessary to maintain access for old website installs.
+  $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
+  foreach ($roles as $r) {
+    if ($r->hasPermission('administer role expire')) {
+      $r->grantPermission('edit users role expire');
+      $r->grantPermission('edit role expire default duration');
+      $r->save();
+    }
+  }
+}
+
+/**
+ * Automatically enable new role_expire_rules submodule.
+ */
+function role_expire_update_10001(&$sandbox): void {
+  if (\Drupal::moduleHandler()->moduleExists('rules')) {
+    \Drupal::service("module_installer")->install(["role_expire_rules"]);
+  }
+}
+
+/**
+ * Added new setting to expand / collapse the role expiration details.
+ *
+ * The expiration details are shown in the user profile form. Setting default
+ * value: FALSE. You can change the value on the role_expire settings page.
+ */
+function role_expire_update_10002(&$sandbox) {
+  \Drupal::configFactory()->getEditable('role_expire.config')->set('role_expire_expiration_details_expanded', FALSE)->save();
+}

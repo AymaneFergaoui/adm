@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ *
+ * SELECT * FROM `d8_key_value` WHERE `value` LIKE '%field_deadline%'
+ *
+ * commerce_product, paquet : product, nom du champ : field_deadline
+ * commerce_product, paquet : product, nom du champ : commerce_stock_override
+ * commerce_product, paquet : product, nom du champ : commerce_stock
+ */
+
+function fix_migration_update_8003() {
+  $entity_type = 'commerce_product';
+  $bundle = 'product';
+  $field_name = 'field_deadline';
+  
+  
+  $key_value_factory = \Drupal::service('keyvalue');
+  $field_map_kv_store = $key_value_factory->get('entity.definitions.bundle_field_map');
+  $map = $field_map_kv_store->get($entity_type);
+
+  unset($map[$field_name]['bundles'][$bundle]);
+  $field_map_kv_store->set($entity_type, $map);
+}
+
+function fix_migration_update_8004() {
+  $entity_type = 'commerce_product';
+  $bundle = 'product';
+  $field_name = 'commerce_stock_override';
+  
+  
+  $key_value_factory = \Drupal::service('keyvalue');
+  $field_map_kv_store = $key_value_factory->get('entity.definitions.bundle_field_map');
+  $map = $field_map_kv_store->get($entity_type);
+
+  unset($map[$field_name]['bundles'][$bundle]);
+  $field_map_kv_store->set($entity_type, $map);
+}
+
+function fix_migration_update_8005() {
+  $entity_type = 'commerce_product';
+  $bundle = 'product';
+  $field_name = 'commerce_stock';
+  
+  
+  $key_value_factory = \Drupal::service('keyvalue');
+  $field_map_kv_store = $key_value_factory->get('entity.definitions.bundle_field_map');
+  $map = $field_map_kv_store->get($entity_type);
+
+  unset($map[$field_name]['bundles'][$bundle]);
+  $field_map_kv_store->set($entity_type, $map);
+}

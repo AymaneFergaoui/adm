@@ -1,0 +1,2 @@
+https://dev.studiopresent.com/blog/back-end/drupal-commerce-2x-and-shipping-conditions
+https://github.com/gnikolovski/commerce_gnikolovski

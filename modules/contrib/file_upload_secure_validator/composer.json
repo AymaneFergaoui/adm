@@ -1,0 +1,17 @@
+{
+    "name": "drupal/file_upload_secure_validator",
+    "description": "File upload MIME validation using fileinfo on the server.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Giannis Pagonas",
+            "email": "giannis.pagonas@zehnplus.ch"
+        },
+        {
+            "name": "Stefanos Petrakis",
+            "email": "stefanos.petrakis@gmail.com"
+        }
+    ],
+    "require": {}
+}

@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function media_formatter_pdf_theme($existing, $type, $theme, $path) {
+
+  return [
+    'media_formatter_pdf_embeded_pdf' => [
+      'variables' => ['url' => NULL],
+    ],
+  ];
+}

@@ -1,0 +1,163 @@
+diff --git a/modules/cart/tests/src/FunctionalJavascript/AddToCartMultilingualTest.php b/modules/cart/tests/src/FunctionalJavascript/AddToCartMultilingualTest.php
+index c0c87a09..279a912b 100644
+--- a/modules/cart/tests/src/FunctionalJavascript/AddToCartMultilingualTest.php
++++ b/modules/cart/tests/src/FunctionalJavascript/AddToCartMultilingualTest.php
+@@ -199,14 +199,14 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
+     $this->cart = Order::load($this->cart->id());
+     $order_items = $this->cart->getItems();
+     $this->assertOrderItemInOrder($this->variations[0]->getTranslation('fr'), $order_items[0]);
+-    $this->assertOrderItemInOrder($this->variations[5]->getTranslation('fr'), $order_items[1]);
++    $this->assertOrderItemInOrder($this->variations[6]->getTranslation('fr'), $order_items[1]);
+   }
+ 
+   /**
+    * Tests the attribute widget default values with a variation url (?v=).
+    */
+   public function testProductVariationAttributesWidgetFromUrl() {
+-    $variation = $this->variations[5];
++    $variation = $this->variations[6];
+     $this->drupalGet($variation->toUrl());
+     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Blue');
+     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'Medium');
+@@ -259,7 +259,7 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
+     $this->cart = Order::load($this->cart->id());
+     $order_items = $this->cart->getItems();
+     $this->assertOrderItemInOrder($this->variations[0]->getTranslation('fr'), $order_items[0]);
+-    $this->assertOrderItemInOrder($this->variations[5]->getTranslation('fr'), $order_items[1]);
++    $this->assertOrderItemInOrder($this->variations[6]->getTranslation('fr'), $order_items[1]);
+   }
+ 
+   /**
+@@ -272,7 +272,7 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
+     ]);
+     $order_item_form_display->save();
+ 
+-    $variation = $this->variations[5];
++    $variation = $this->variations[6];
+     $this->drupalGet($variation->toUrl());
+     $this->assertSession()->selectExists('purchased_entity[0][variation]');
+     $this->assertAttributeSelected('purchased_entity[0][variation]', 'My Super Product - Blue, Medium');
+diff --git a/modules/order/src/Plugin/Field/FieldWidget/UnitPriceWidget.php b/modules/order/src/Plugin/Field/FieldWidget/UnitPriceWidget.php
+index 4adbbf95..f77bb89b 100644
+--- a/modules/order/src/Plugin/Field/FieldWidget/UnitPriceWidget.php
++++ b/modules/order/src/Plugin/Field/FieldWidget/UnitPriceWidget.php
+@@ -79,7 +79,6 @@ class UnitPriceWidget extends WidgetBase {
+     $element['amount'] = [
+       '#type' => 'commerce_price',
+       '#title' => $this->fieldDefinition->getLabel(),
+-      '#required' => $this->fieldDefinition->isRequired(),
+       '#available_currencies' => array_filter($this->getFieldSetting('available_currencies')),
+     ];
+     if (!$items[$delta]->isEmpty()) {
+@@ -110,10 +109,18 @@ class UnitPriceWidget extends WidgetBase {
+     if ($values) {
+       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+       $order_item = $items[0]->getEntity();
+-      if (!$this->getSetting('require_confirmation') || !empty($values['override'])) {
++      if (!$this->getSetting('require_confirmation') || !empty($values['override']) && is_numeric($values['amount']['number'])) {
+         $unit_price = Price::fromArray($values['amount']);
+         $order_item->setUnitPrice($unit_price, TRUE);
+       }
++      elseif ($purchased_entity = $order_item->getPurchasedEntity()) {
++        $unit_price = $purchased_entity->getPrice();
++        $order_item->setUnitPrice($unit_price, FALSE);
++      }
++      else {
++        $unit_price = new Price('0', $values['amount']['currency_code']);
++        $order_item->setUnitPrice($unit_price, FALSE);
++      }
+ 
+       // Put delta mapping in $form_state, so that flagErrors() can use it.
+       $field_state = static::getWidgetState($form['#parents'], $field_name, $form_state);
+diff --git a/modules/order/tests/src/FunctionalJavascript/OrderAdminTest.php b/modules/order/tests/src/FunctionalJavascript/OrderAdminTest.php
+index a89594bd..4f5bf4d2 100644
+--- a/modules/order/tests/src/FunctionalJavascript/OrderAdminTest.php
++++ b/modules/order/tests/src/FunctionalJavascript/OrderAdminTest.php
+@@ -76,17 +76,30 @@ class OrderAdminTest extends OrderWebDriverTestBase {
+     // outcome.
+     $this->assertSame([], \Drupal::state()->get("commerce_order_test_field_widget_form_alter"));
+ 
+-    // Test creating an order item.
+-    $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
++    // Test creating order items.
+     $page = $this->getSession()->getPage();
++
++    // First item with overriding the price.
++    $entity1 = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
+     $page->checkField('Override the unit price');
+-    $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity);
++    $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity1);
+     $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
+     $page->fillField('order_items[form][inline_entity_form][unit_price][0][amount][number]', '9.99');
+     $this->getSession()->getPage()->pressButton('Create order item');
+     $this->waitForAjaxToFinish();
+     $this->assertSession()->pageTextContains('9.99');
+ 
++    // Second item without overriding the price.
++    $entity2 = $this->secondVariation->getSku() . ' (' . $this->secondVariation->id() . ')';
++    $this->waitForAjaxToFinish();
++    $this->getSession()->getPage()->pressButton('Add new order item');
++    $this->waitForAjaxToFinish();
++    $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity2);
++    $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
++    $this->getSession()->getPage()->pressButton('Create order item');
++    $this->waitForAjaxToFinish();
++    $this->assertSession()->pageTextContains('5.55');
++
+     // Test editing an order item.
+     $edit_buttons = $this->xpath('//div[@data-drupal-selector="edit-order-items-wrapper"]//input[@value="Edit"]');
+     $edit_button = reset($edit_buttons);
+@@ -120,8 +133,8 @@ class OrderAdminTest extends OrderWebDriverTestBase {
+     $this->assertEquals(1, count($order_number));
+ 
+     $order = Order::load(1);
+-    $this->assertEquals(1, count($order->getItems()));
+-    $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
++    $this->assertEquals(2, count($order->getItems()));
++    $this->assertEquals(new Price('10.88', 'USD'), $order->getTotalPrice());
+     $this->assertCount(1, $order->getAdjustments());
+     $billing_profile = $order->getBillingProfile();
+     $this->assertEquals($this->defaultAddress, array_filter($billing_profile->get('address')->first()->toArray()));
+diff --git a/modules/order/tests/src/FunctionalJavascript/OrderWebDriverTestBase.php b/modules/order/tests/src/FunctionalJavascript/OrderWebDriverTestBase.php
+index bb77756b..64935643 100644
+--- a/modules/order/tests/src/FunctionalJavascript/OrderWebDriverTestBase.php
++++ b/modules/order/tests/src/FunctionalJavascript/OrderWebDriverTestBase.php
+@@ -16,6 +16,13 @@ abstract class OrderWebDriverTestBase extends CommerceWebDriverTestBase {
+    */
+   protected $variation;
+ 
++  /**
++   * Second variation to test against.
++   *
++   * @var \Drupal\commerce_product\Entity\ProductVariation
++   */
++  protected $secondVariation;
++
+   /**
+    * Modules to enable.
+    *
+@@ -55,13 +62,23 @@ abstract class OrderWebDriverTestBase extends CommerceWebDriverTestBase {
+       ],
+     ]);
+ 
++    // Create a product variation.
++    $this->secondVariation = $this->createEntity('commerce_product_variation', [
++      'type' => 'default',
++      'sku' => $this->randomMachineName(),
++      'price' => [
++        'number' => 5.55,
++        'currency_code' => 'USD',
++      ],
++    ]);
++
+     // We need a product too otherwise tests complain about the missing
+     // backreference.
+     $this->createEntity('commerce_product', [
+       'type' => 'default',
+       'title' => $this->randomMachineName(),
+       'stores' => [$this->store],
+-      'variations' => [$this->variation],
++      'variations' => [$this->variation, $this->secondVariation],
+     ]);
+   }
+ 

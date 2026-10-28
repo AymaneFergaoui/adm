@@ -1,0 +1,20 @@
+# Ignore Drupal environment-specific settings & user-uploaded files
+/sites/*/settings.php
+/sites/*/settings.local.php
+/sites/*/files/
+/sites/default/files/
+
+# Ignore database dumps and temporary/diagnostic scripts
+*.sql
+*.sql.gz
+*.mysql.gz
+/scratch/
+/clear_cache_prod.php
+/test_*.php
+
+# Ignore OS / Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

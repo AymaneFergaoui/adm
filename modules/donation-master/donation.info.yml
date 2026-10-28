@@ -1,0 +1,9 @@
+name: Donation
+type: module
+description: Donation Entity without bundle, Allows you to collect donations.
+core_version_requirement: ^8 || ^9 || ^10
+package: Custom Entities
+dependencies:
+  - drupal:datetime_range
+  - drupal:views
+  # - drupal:date_popup

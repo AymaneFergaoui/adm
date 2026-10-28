@@ -1,0 +1,6 @@
+stripe_payment:
+  version: 1.x
+  js:
+    https://js.stripe.com/v3/: { type: external }
+  dependencies:
+    - core/jquery

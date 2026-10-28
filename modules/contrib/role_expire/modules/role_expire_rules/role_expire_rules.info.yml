@@ -1,0 +1,12 @@
+name: Role Expire Rules
+description: "Provides rules module integration"
+type: module
+core_version_requirement: ^10.2 || ^11
+dependencies:
+  - role_expire:role_expire
+  - rules:rules
+
+# Information added by Drupal.org packaging script on 2024-10-31
+version: '4.1.1'
+project: 'role_expire'
+datestamp: 1730396660

@@ -1,0 +1,4 @@
+administer file upload secure validator configuration:
+  title: 'Administer File Upload Secure Validator configuration'
+  description: 'Allow user to administer File Upload Secure Validator configuration.'
+  restrict access: TRUE

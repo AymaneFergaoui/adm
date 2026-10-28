@@ -1,0 +1,24 @@
+{
+    "name": "gnikolovski/commerce_gnikolovski",
+    "description": "Provides some useful Drupal Commerce 2.x stuff.",
+    "type": "drupal-module",
+    "homepage": "https://github.com/gnikolovski/commerce_gnikolovski",
+    "authors": [
+        {
+            "name": "Goran Nikolovski",
+            "email": "goran@gorannikolovski.com",
+            "homepage": "https://gorannikolovski.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/gnikolovski/commerce_gnikolovski/issues",
+        "email": "goran@gorannikolovski.com"
+    },
+    "license": "GPL-2.0+",
+    "minimum-stability": "dev",
+    "require": {
+        "drupal/commerce_shipping": "^2.0",
+        "drupal/core": "^8 || ^9"
+    }
+}

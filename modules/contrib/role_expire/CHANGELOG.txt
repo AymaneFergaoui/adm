@@ -1,0 +1,142 @@
+Role expire 4.1.1, 2024-10-31
+-----------------------------
+#3479606: Rename js folder "libraries" to "js"
+#3479613: Make 4.x the default branch in GitLab Settings > Branches
+#3479609: Regression: Unchecking a role entirely hides the parent details fieldset
+
+Role expire 4.1.0, 2024-10-01
+-----------------------------
+#3463811: Make the user expiration form field less prominent below the roles
+#3471139: Add parameter and return types declarations
+
+Role expire 4.0.2, 2024-09-23
+-----------------------------
+#3475731: Remove optional rules (+typed_data) dependency from composer.json
+
+Role expire 4.0.1, 2024-08-17
+-----------------------------
+Avoid problem while updating to Role Expire 4.x from 3.x versions
+#3467601: Wrong handling of roles when editing a user with Role Delegation enabled
+
+Role expire 4.0.0, 2024-08-14
+-----------------------------
+#3434268: Drupal 11 compatible version + move rules integration to a new submodule + phpcs, eslint, phpstan and phpcs fixes
+#3426271: Apply dependency injection where possible
+
+Role expire 3.0.2, 2023-11-26
+-----------------------------
+Enabled GitlabCI
+#3199401: Support Migrating From D7
+
+Role expire 3.0.1, 2023-07-18
+-----------------------------
+#3374653: ($event) must be of type object
+
+Role expire 3.0.0, 2022-11-26
+-----------------------------
+#3289409: Automated Drupal 10 compatibility fixes
+
+Role expire 2.0.4, 2022-11-26
+-----------------------------
+#3321049: Replace README.txt with README.md
+#3309899: Use the ModuleHandlerInterface instead of the ModuleHandler concrete implementation
+#3309311: User is logged out when user profile was updated by an admin
+
+Role expire 2.0.3, 2022-08-12
+-----------------------------
+#3268319: Add more info to the role expire field description on the user edit form
+#3265491: PHP 8 Compatibility call_user_func_array
+
+Role expire 2.0.2, 2022-02-05
+-----------------------------
+Updated tests
+#3245828: Show all roles on profile, not just those that expire
+#3245817: Show "friendly" name for role instead of machine name
+#3248606: Fix missing config schema definitions
+#3258159: Role expiration doesn't set for role which was added automatically during registration
+#3251200: writeRecord API method always deletes session
+#3258020: Role expire data appears and dissappears when another module interacts (password policy)
+
+Role expire 2.0.1, 2021-07-03
+-----------------------------
+#3193800: RoleExpiresEvent should not depend on Rules module
+#3203077: Create additional permissions
+#3213495: Highlight relative expiry dates can be set using rules action
+Moved Role Expire configuration form to "Configuration > People > Role expire"
+
+Role expire 2.0.0, 2020-12-24
+-----------------------------
+Adopted semantic versioning. No major changes since 8.x-1.8
+#3168571: User is logged out on role_expire deletion (make it optional)
+#3168813: Losing expiration data when combined with RoleAssign and Role Delegation
+
+Role expire 8.x-1.8, 2020-07-30
+-------------------------------
+#3160359: Error on react on event rule
+
+Role expire 8.x-1.7, 2020-06-27
+-------------------------------
+#3137887: PHP notice on registration page
+#3143191: Drupal 9 Deprecated Code Report
+#3152133: Create pseudo-field for role expire on user display
+#3142555: Provide an option to disable RE for selected roles
+
+Role expire 8.x-1.6, 2020-04-14
+-------------------------------
+Code cleanup using PHP CodeSniffer
+Remove Role Expire deprecated API calls
+Remove duplicated code on configuration form
+#3123747: Default duration should be saved in config
+
+Role expire 8.x-1.4, 2020-03-20
+-------------------------------
+Full compatibility with Drupal 9
+Requires Drupal 8.8 or newer
+
+Role expire 8.x-1.3, 2019-10-06
+-------------------------------
+#3083481: Remove unused variable
+#3029593: Support role assignment modules
+Remove another unused variable
+Remove usage of Deprecated REQUEST_TIME
+Remove two unused use statements
+Update deprecated tags in old API calls
+Updated PHPDoc for API calls
+Simplify call to writeRecord in processDefaultRoleDurationForUser API call
+
+Role expire 8.x-1.2, 2019-09-23
+-------------------------------
+#3080679: End sessions when expiring roles
+#3080861: Exclude authenticated and anonymous role while assigning new role after expiration
+Fixed views fields "Role expiration date/time" and "Role expiration role" to
+avoid row duplicates
+Tests: Moved helper functions to a Trait
+
+Role expire 8.x-1.1, 2019-02-07
+-------------------------------
+README improvement
+Added tests
+Source code improvements (dependency injection)
+#3030519: Assign default expiration for new role created on cron expiry
+Remove usage of deprecated drupal_set_message method
+
+Role expire 8.x-1.0, 2018-09-11
+-------------------------------
+Move all API functions to a new service, deprecate old API calls
+#2998705: More flexibility for default durations
+
+Role expire 8.x-1.0-rc3, 2018-08-12
+------------------------------------
+Basic integration with views: same fields as 7.x version
+
+Role expire 8.x-1.0-rc2, 2018-08-10
+------------------------------------
+Basic views integration added!
+
+Role expire 8.x-1.0-rc1, 2018-02-18
+-----------------------------------
+Rules integration added!
+
+Role expire 8.x-1.0-beta1, 2017-08-30
+-------------------------------------
+First Drupal 8 version.

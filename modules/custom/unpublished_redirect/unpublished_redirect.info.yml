@@ -1,0 +1,5 @@
+name: 'Unpublished Redirect'
+type: module
+description: 'Redirects unpublished node requests to the homepage.'
+package: 'Custom'
+core_version_requirement: ^8 || ^9 || ^10 || ^11

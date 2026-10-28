@@ -1,0 +1,23 @@
+stripe_donation.content:
+  path: 'donate'
+  defaults:
+    _controller: '\Drupal\stripe_donation\Controller\StripeDonationController::content'
+    _title: 'Règlement excursion ou voyage'
+  requirements:
+    _permission: 'access content'
+
+stripe_donation.config:
+  path: 'admin/config/api/stripe_donation'
+  defaults:
+    _form: '\Drupal\stripe_donation\Form\StripeDonationConfigForm'
+    _title: 'Stripe Donation Configuration'
+  requirements:
+    _permission: 'administer stripe donation'
+
+stripe_donation.thank_you:
+  path: '/stripe-donation/thank-you'
+  defaults:
+    _controller: '\Drupal\stripe_donation\Controller\StripeDonationController::thankYouPage'
+    _title: 'Thank You'
+  requirements:
+    _permission: 'access content'

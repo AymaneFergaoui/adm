@@ -1,0 +1,68 @@
+<?php
+/**
+ * @file
+ * A field formatter for the File field.
+ *
+ * This formatter renders the file as an embedded document,
+ * using Google's Google Docs embeddable file viewer.
+ * At the current time this viewer will reasonably display files of these
+ * types: Adobe .pdf, Microsoft .doc/.docx, .xls/.xlsx. and .ppt/.pptx.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function file_formatter_pdf_help($route_name, RouteMatchInterface $route_match) {
+  $helptext = '';
+  if ($route_name == 'help.page.file_formatter_pdf') {
+    $helptext = '<p>';
+    $helptext .= t('This module provides a new format for the File field type. Only PDF.');
+    $helptext .= '</p>';
+    $helptext .= '<p>';
+    $helptext .= t("N.B.: Only files that are public may use this formatter");
+    $helptext .= '</p>';
+    $helptext .= '<p>';
+    $helptext .= t("To use this field format, add a File field to a new or existing content type (such as Basic Page) on the content type's Manage Fields form. The File field type provides only one widget type - File - so select that. On the content type's 'Manage Display' form, there will be a drop-down select list of available display formats for the File field.");
+    $helptext .= '</p>';
+  }
+  return $helptext;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function file_formatter_pdf_theme() {
+  return array(
+    'file_formatter_pdf' => array(
+      'variables' => array(
+        'url' => NULL,
+        'filename' => NULL,
+        'delta' => NULL,
+        'entity' => NULL,
+        'bundle' => NULL,
+        'field_name' => NULL,
+        'field_type' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function file_formatter_pdf_theme_suggestions_file_formatter_pdf(array $variables) {
+  $entity = $variables['entity'];
+  $bundle = $variables['bundle'];
+  $delta = $variables['delta'];
+  $field_name = $variables['field_name'];
+  $field_type = $variables['field_type'];
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $entity;
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $entity . '__' . $bundle;
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $entity . '__' . $bundle . '__' . $delta;
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $field_type;
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $field_type . '__' . $field_name;
+  $suggestions[] = $variables['theme_hook_original'] . '__' . $field_type . '__' . $field_name . '__' . $delta;
+  return $suggestions;
+}

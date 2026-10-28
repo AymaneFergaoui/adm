@@ -1,0 +1,12 @@
+name: views_filter_tag
+type: module
+description: 'Check if node exist with the exposed filter'
+package: Views [ATOZ]
+
+dependencies:
+  - 'drupal:views'
+  - 'drupal:system (>= 8.5)'
+
+
+version: '8.x-0.1'
+core_version_requirement: ^8 || ^9 || ^10

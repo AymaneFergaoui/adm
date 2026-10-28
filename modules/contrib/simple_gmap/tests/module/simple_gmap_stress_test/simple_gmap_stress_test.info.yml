@@ -1,0 +1,12 @@
+name: simple_gmap_stress_test
+type: module
+description: 'Provides a stress_test content entity.'
+package: Testing
+core_version_requirement: ^10.3 || ^11 || ^12
+dependencies:
+  - simple_gmap:simple_gmap
+
+# Information added by Drupal.org packaging script on 2026-07-21
+version: '4.0.1'
+project: 'simple_gmap'
+datestamp: 1784641959

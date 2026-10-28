@@ -1,0 +1,26 @@
+{
+    "name": "drupal/convert_bundles",
+    "description": "Convert entity bundles from one value to another.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "keywords": ["Drupal"],
+    "homepage": "https://www.drupal.org/project/convert_bundles",
+    "authors": [
+        {
+            "name": "Eliot Scott (el1_1el)",
+            "homepage": "https://www.drupal.org/u/el1_1el",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Joseph Olstad (joseph.olstad)",
+            "homepage": "https://www.drupal.org/u/josepholstad",
+            "role": "Maintainer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/convert_bundles",
+        "source": "https://git.drupalcode.org/project/convert_bundles"
+    },
+    "require": { }
+}

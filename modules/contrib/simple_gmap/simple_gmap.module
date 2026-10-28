@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Simple Google Maps module.
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\simple_gmap\Hook\SimpleGmapThemeHooks;
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function simple_gmap_theme(): array {
+  return \Drupal::service(SimpleGmapThemeHooks::class)->theme();
+}

@@ -1,0 +1,5 @@
+file_formatter_pdf:
+  version: VERSION
+  css:
+    theme:
+      css/file_formatter_pdf.css: {}

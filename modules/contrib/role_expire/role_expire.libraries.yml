@@ -1,0 +1,6 @@
+role_expire:
+  js:
+    js/role_expire.js: {}
+  dependencies:
+    - core/jquery
+    - core/once

@@ -1,0 +1,9 @@
+# Entity routes are defined on Entity Class. There is no need to define entity
+# routes
+donation.structure:
+  path: '/admin/structure/donations'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Donations'
+  requirements:
+    _permission: 'administer donation entities'

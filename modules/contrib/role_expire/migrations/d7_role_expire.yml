@@ -1,0 +1,26 @@
+id: d7_role_expire
+label: D7 Role Expire Data
+migration_tags:
+  - Drupal 7
+source:
+  plugin: role_expire
+process:
+  uid: uid
+  rid:
+    plugin: migration_lookup
+    migration: d7_user_role
+    source: rid
+  expiry_timestamp: expiry_timestamp
+destination:
+  plugin: table
+  table_name: role_expire
+  id_fields:
+    uid:
+      type: integer
+  fields:
+    uid: uid
+    rid: rid
+    expiry_timestamp: expiry_timestamp
+migration_dependencies:
+  required:
+    - d7_user

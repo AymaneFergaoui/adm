@@ -1,0 +1,138 @@
+<?php
+/**
+ * @file
+ * Contains views_filter_tag.module.
+ * Author : NIA
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_form_FORM_ID_form_alter().
+ */
+function views_filter_tag_form_views_exposed_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state)
+{
+  // If the exposed filter does not exist on this form, there's nothing we can do here.
+  if (!array_key_exists('field_service_line_target_id', $form) && !array_key_exists('field_author_target_id', $form) && !array_key_exists('field_mediatype_target_id', $form)) {
+    return;
+  }
+
+   
+  
+   $connection = \Drupal::database();
+  
+   // Service Line Filter
+   if(array_key_exists('field_service_line_target_id', $form)){ 
+   
+	  // switch sur le bundle
+	  $current_path = \Drupal::service('path.current')->getPath();
+	  $bundle = "article";
+	  if (strpos($current_path, 'media') !== false || strpos($current_path, 'brochure') !== false) {
+		   $bundle = "media";
+	  }
+	  else if (strpos($current_path, 'event') !== false) {
+		   $bundle = "event";
+	  }
+
+	  // Options are tag entity id => title.
+	  $options_sl = $form['field_service_line_target_id']['#options'];
+
+	  // We are querying for tags belonging to at least one node.
+	  // We group by tag id so we don't get a result for each
+	  // node the tag is referred by.
+	  // We also set a condition on the bundle, as we could have
+	  // other bundles using same field.
+	  $query_sl = $connection->query("SELECT field_service_line_target_id FROM {node__field_service_line} WHERE bundle='".$bundle."' GROUP BY field_service_line_target_id");
+	
+	  // Flip the result set so the array key is the tag entity id.
+	  $results_sl = array_flip($query_sl->fetchAll(\PDO::FETCH_COLUMN, 'field_service_line_target_id'));
+	  //var_dump($results_sl);
+	  
+	  $new_options_sl = array();
+	  foreach ($options_sl as $key => $value){
+		  if($key === "All"){
+				$new_options_sl[$key] = $value;
+		  }
+		  else{
+			 //var_dump("<br>".$key);
+			 $sl_option = $value->option;
+			 $sl_key = key($sl_option);
+			 //var_dump($sl_key);
+			 if(array_key_exists($sl_key,$results_sl)){
+				$new_options_sl[$key] = $value; 
+				//var_dump("ok");
+			 }
+		  }
+	  }	  
+	  // Replace the options.
+	  $form['field_service_line_target_id']['#options'] = $new_options_sl;
+   }
+   
+    // Author Filter
+   if(array_key_exists('field_author_target_id', $form)){ 
+	  // Options are tag entity id => title.
+	  $options_a = $form['field_author_target_id']['#options'];
+ 
+	  // We are querying for tags belonging to at least one node.
+	  // We group by tag id so we don't get a result for each
+	  // node the tag is referred by.
+	  // We also set a condition on the bundle, as we could have
+	  // other bundles using same field.
+	  $query_a = $connection->query("SELECT field_author_target_id FROM {node__field_author} WHERE bundle='article' GROUP BY field_author_target_id");
+	
+	  // Flip the result set so the array key is the tag entity id.
+	  $results_a = array_flip($query_a->fetchAll(\PDO::FETCH_COLUMN, 'field_author_target_id'));
+	  //var_dump($results_a);
+	 
+	  $new_options_a = array();
+	  foreach ($options_a as $key => $value){
+		  if($key === "All"){
+				$new_options_a[$key] = $value;
+		  }
+		  else{
+			 $a_option = $value->option;
+			 $a_key = key($a_option);
+			 if(array_key_exists($a_key,$results_a)){
+				$new_options_a[$key] = $value; 
+			 }
+		  }
+	  }	  	  
+	  // Replace the options.
+	  $form['field_author_target_id']['#options'] = $new_options_a;
+   }
+   
+   // Media Filter
+   if(array_key_exists('field_mediatype_target_id', $form)){ 
+	  // Options are tag entity id => title.
+	  $options_m = $form['field_mediatype_target_id']['#options'];
+ 
+	  // We are querying for tags belonging to at least one node.
+	  // We group by tag id so we don't get a result for each
+	  // node the tag is referred by.
+	  // We also set a condition on the bundle, as we could have
+	  // other bundles using same field.
+	  $query_m = $connection->query("SELECT field_mediatype_target_id FROM {node__field_mediatype} WHERE bundle='media' GROUP BY field_mediatype_target_id");
+	
+	  // Flip the result set so the array key is the tag entity id.
+	  $results_m = array_flip($query_m->fetchAll(\PDO::FETCH_COLUMN, 'field_mediatype_target_id'));
+	  //var_dump($results_m);
+	 
+	  $new_options_m = array();
+	  foreach ($options_m as $key => $value){
+		  if($key === "All"){
+				$new_options_m[$key] = $value;
+		  }
+		  else{
+			 $m_option = $value->option;
+			 $m_key = key($m_option);
+			 if(array_key_exists($m_key,$results_m)){
+				$new_options_m[$key] = $value; 
+			 }
+		  }
+	  }	  	  
+	  // Replace the options.
+	  $form['field_mediatype_target_id']['#options'] = $new_options_m;
+   }
+   
+}
+?>

@@ -1,0 +1,13 @@
+services:
+  socialfeed.facebook:
+    class: Drupal\socialfeed\Services\FacebookPostCollectorFactory
+    arguments: ['@config.factory']
+  socialfeed.twitter:
+    class: Drupal\socialfeed\Services\TwitterPostCollectorFactory
+    arguments: ['@config.factory']
+  socialfeed.instagram_api:
+    class: Drupal\socialfeed\Services\InstagramApiService
+    arguments: ['@http_client', '@logger.factory']
+  socialfeed.instagram:
+    class: Drupal\socialfeed\Services\InstagramPostCollectorFactory
+    arguments: ['@config.factory', '@socialfeed.instagram_api']

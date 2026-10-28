@@ -1,0 +1,16 @@
+name: Commerce Donate
+type: module
+description: 'Provides donation functionality.'
+package: 'Commerce (Contrib)'
+core_version_requirement: ^8 || ^9 || ^10
+
+dependencies:
+  - commerce:commerce_order
+  - commerce:commerce_price
+  - commerce_currency_resolver
+  - select_or_other
+
+# Information added by Drupal.org packaging script on 2021-10-05
+version: '8.x-1.1-alpha1'
+project: 'commerce_donate'
+datestamp: 1633472818

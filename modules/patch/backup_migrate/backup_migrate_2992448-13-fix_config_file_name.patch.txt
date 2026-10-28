@@ -1,0 +1,4 @@
+diff --git a/config/install/backup_migrate.backup_migrate_schedule.daily.yml b/config/install/backup_migrate.backup_migrate_schedule.daily_schedule.yml
+similarity index 100%
+rename from config/install/backup_migrate.backup_migrate_schedule.daily.yml
+rename to config/install/backup_migrate.backup_migrate_schedule.daily_schedule.yml

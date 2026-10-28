@@ -1,0 +1,30 @@
+bootstrap_ecl.Xsmall:
+  label: Xsmall
+  mediaQuery: 'all and (max-width: 575px)'
+  weight: 0
+  multipliers:
+    - 1x
+bootstrap_ecl.small:
+  label: small
+  mediaQuery: 'all and (min-width: 576px) and (max-width: 767px)'
+  weight: 1
+  multipliers:
+    - 1x
+bootstrap_ecl.medium:
+  label: medium
+  mediaQuery: 'all and (min-width: 768px) and (max-width: 991px)'
+  weight: 2
+  multipliers:
+    - 1x
+bootstrap_ecl.large:
+  label: large
+  mediaQuery: 'all and (min-width: 992px) and (max-width: 1199px)'
+  weight: 3
+  multipliers:
+    - 1x
+bootstrap_ecl.Xlarge:
+  label: Xlarge
+  mediaQuery: 'all and (min-width: 1200px)'
+  weight: 4
+  multipliers:
+    - 1x

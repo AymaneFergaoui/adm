@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Contains donation.module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function donation_theme() {
+  $theme = [];
+  $theme['donation'] = [
+    'render element' => 'elements',
+    'file' => 'donation.page.inc',
+    'template' => 'donation',
+  ];
+  $theme['donation_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'donation.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function donation_theme_suggestions_donation(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#donation'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'donation__' . $sanitized_view_mode;
+  $suggestions[] = 'donation__' . $entity->bundle();
+  $suggestions[] = 'donation__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'donation__' . $entity->id();
+  $suggestions[] = 'donation__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+
+function donation_entity_base_field_info_alter(&$fields, $entity_type) {
+  // By default email address field of user entity is hidden in 'Manage display"
+  // tab.
+  if ($entity_type->id() == 'user') {
+    if (isset($fields['mail'])) {
+      $fields['mail']->setDisplayConfigurable('view', TRUE);
+      $fields['mail']->setDisplayConfigurable('form', TRUE);
+    }
+  }
+}

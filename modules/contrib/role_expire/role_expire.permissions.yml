@@ -1,0 +1,12 @@
+administer role expire:
+  title: 'Administer role expire'
+  description: 'Allow users to configure module (admin/config/people/role-expire).'
+  restrict access: TRUE
+edit users role expire:
+  title: 'Edit users role expire'
+  description: 'Allow users to edit role expiration dates for other users (user/#/edit).'
+  restrict access: TRUE
+edit role expire default duration:
+  title: 'Edit role expire default duration'
+  description: 'Allow users to edit roles default duration (admin/people/roles/manage/#).'
+  restrict access: TRUE
