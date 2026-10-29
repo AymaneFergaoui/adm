@@ -75,7 +75,15 @@ class AliasRepository implements AliasRepositoryInterface {
 
     $select->orderBy('base_table.id', 'DESC');
 
-    return $select->execute()->fetchAssoc() ?: NULL;
+    $result = $select->execute()->fetchAssoc();
+    if (!$result) {
+      $fallback = $this->getBaseQuery()
+        ->fields('base_table', ['id', 'path', 'alias', 'langcode'])
+        ->condition('base_table.path', $this->connection->escapeLike($path), 'LIKE')
+        ->orderBy('base_table.id', 'DESC');
+      $result = $fallback->execute()->fetchAssoc();
+    }
+    return $result ?: NULL;
   }
 
   /**
@@ -91,7 +99,15 @@ class AliasRepository implements AliasRepositoryInterface {
 
     $select->orderBy('base_table.id', 'DESC');
 
-    return $select->execute()->fetchAssoc() ?: NULL;
+    $result = $select->execute()->fetchAssoc();
+    if (!$result) {
+      $fallback = $this->getBaseQuery()
+        ->fields('base_table', ['id', 'path', 'alias', 'langcode'])
+        ->condition('base_table.alias', $this->connection->escapeLike($alias), 'LIKE')
+        ->orderBy('base_table.id', 'DESC');
+      $result = $fallback->execute()->fetchAssoc();
+    }
+    return $result ?: NULL;
   }
 
   /**
