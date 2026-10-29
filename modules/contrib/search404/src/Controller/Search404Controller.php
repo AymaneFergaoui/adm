@@ -190,7 +190,7 @@ class Search404Controller extends ControllerBase {
       // Build the form first, because it may redirect during the submit,
       // and we don't want to build the results based on last time's request.
       $plugin->setSearch($keys, $request->query->all(), $request->attributes->all());
-      if ($keys && !$this->config('search404.settings')->get('search404_skip_auto_search')) {
+      if (FALSE && $keys && !$this->config('search404.settings')->get('search404_skip_auto_search')) {
         // If custom search enabled.
         if ($this->moduleHandler()->moduleExists('search_by_page') && $this->config('search404.settings')->get('search404_do_search_by_page')) {
           $this->search404CustomErrorMessage($keys);

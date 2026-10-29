@@ -207,17 +207,26 @@ class FullcalendarViewPreprocess {
 
       // Preload node path aliases in a single query when using simple title links.
       $alias_map = [];
-      if ($simple_title && $entity_type->id() === 'node') {
+      if ($simple_title && $entity_type->id() === 'node' && !empty($view->result)) {
         try {
-          $db = \Drupal::database();
-          if ($db->schema()->tableExists('path_alias')) {
-            $q = $db->select('path_alias', 'pa')
-              ->fields('pa', ['path', 'alias', 'langcode'])
-              ->condition('status', 1)
-              ->condition('path', '/node/%', 'LIKE');
-            foreach ($q->execute() as $arow) {
-              if ($arow->langcode === $lang_id || !isset($alias_map[$arow->path])) {
-                $alias_map[$arow->path] = $arow->alias;
+          $node_paths = [];
+          foreach ($view->result as $r_item) {
+            if (!empty($r_item->_entity)) {
+              $node_paths[] = '/node/' . $r_item->_entity->id();
+            }
+          }
+          $node_paths = array_unique($node_paths);
+          if (!empty($node_paths)) {
+            $db = \Drupal::database();
+            if ($db->schema()->tableExists('path_alias')) {
+              $q = $db->select('path_alias', 'pa')
+                ->fields('pa', ['path', 'alias', 'langcode'])
+                ->condition('status', 1)
+                ->condition('path', $node_paths, 'IN');
+              foreach ($q->execute() as $arow) {
+                if ($arow->langcode === $lang_id || !isset($alias_map[$arow->path])) {
+                  $alias_map[$arow->path] = $arow->alias;
+                }
               }
             }
           }

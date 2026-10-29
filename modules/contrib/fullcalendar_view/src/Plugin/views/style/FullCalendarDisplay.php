@@ -783,6 +783,19 @@ class FullCalendarDisplay extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
+  public function query() {
+    parent::query();
+    if (isset($this->view->query) && method_exists($this->view->query, 'setLimit')) {
+      $pager = $this->view->display_handler->getOption('pager');
+      if (!empty($pager['type']) && $pager['type'] === 'none') {
+        $this->view->query->setLimit(150);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function render() {
     return [
       '#theme' => $this->themeFunctions(),
