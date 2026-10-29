@@ -198,6 +198,35 @@ class FullcalendarViewPreprocess {
       }
       // Timezone conversion service.
       $timezone_service = $this->utcToLocal;
+      $need_des = !empty($options['dialogWindow']);
+      $simple_title = (empty($options['title']) || $options['title'] == 'title')
+        && empty($fields['title']->options['alter']['alter_text']);
+      $lang_id = $language->getId();
+      $is_anonymous = $user->isAnonymous();
+      $base_path = base_path();
+
+      // Preload node path aliases in a single query when using simple title links.
+      $alias_map = [];
+      if ($simple_title && $entity_type->id() === 'node') {
+        try {
+          $db = \Drupal::database();
+          if ($db->schema()->tableExists('path_alias')) {
+            $q = $db->select('path_alias', 'pa')
+              ->fields('pa', ['path', 'alias', 'langcode'])
+              ->condition('status', 1)
+              ->condition('path', '/node/%', 'LIKE');
+            foreach ($q->execute() as $arow) {
+              if ($arow->langcode === $lang_id || !isset($alias_map[$arow->path])) {
+                $alias_map[$arow->path] = $arow->alias;
+              }
+            }
+          }
+        }
+        catch (\Throwable $e) {
+          // Fallback silently if path_alias query fails.
+        }
+      }
+
       // Save view results into entries array.
       foreach ($view->result as $row) {
         // Set the row_index property used by advancedRender function.
@@ -233,7 +262,7 @@ class FullcalendarViewPreprocess {
         $current_entity->get($end_field)->getValue();
         // Render all other fields to so they can be used in rewrite.
         $des = [];
-        if (!empty($start_dates) && is_array($start_dates)) {
+        if ($need_des && !empty($start_dates) && is_array($start_dates)) {
           foreach ($start_dates as $i => $start_date) {
             $idkey = $row->index . '-' . $i;
             foreach ($fields as $name => $field) {
@@ -246,37 +275,45 @@ class FullcalendarViewPreprocess {
           }
         }
         // Event title.
-        if (empty($options['title']) || $options['title'] == 'title') {
-          $title = $fields['title']->advancedRender($row);
-        }
-        elseif (!empty($fields[$options['title']])) {
-          $title = $fields[$options['title']]->advancedRender($row);
-        }
-        else {
-          $title = $this->t('Invalid event title');
-        }
-        // Render the title to a string to safely extract the URL and sanitize.
-        $rendered_title = is_array($title) ? \Drupal::service('renderer')->renderRoot($title) : (string) $title;
-        $link_url = strstr($rendered_title, 'href="');
-        if ($link_url) {
-          $link_url = substr($link_url, 6);
-          $link_url = strstr($link_url, '"', TRUE);
+        if ($simple_title) {
+          $rendered_title = (string) $current_entity->label();
+          $internal_path = '/' . $entity_type->id() . '/' . $entity_id;
+          $alias = $alias_map[$internal_path] ?? $internal_path;
+          $link_url = rtrim($base_path, '/') . $alias;
         }
         else {
-          $link_url = '';
+          if (empty($options['title']) || $options['title'] == 'title') {
+            $title = $fields['title']->advancedRender($row);
+          }
+          elseif (!empty($fields[$options['title']])) {
+            $title = $fields[$options['title']]->advancedRender($row);
+          }
+          else {
+            $title = $this->t('Invalid event title');
+          }
+          // Render the title to a string to safely extract the URL and sanitize.
+          $rendered_title = is_array($title) ? \Drupal::service('renderer')->renderRoot($title) : (string) $title;
+          $link_url = strstr($rendered_title, 'href="');
+          if ($link_url) {
+            $link_url = substr($link_url, 6);
+            $link_url = strstr($link_url, '"', TRUE);
+          }
+          else {
+            $link_url = '';
+          }
         }
         // For multiple value field, create a respective calendar entry
         // for each date value.
         if (!empty($start_dates) && is_array($start_dates)) {
           foreach ($start_dates as $i => $start_date) {
             $idkey = $row->index . '-' . $i;
-            $rendered_des = isset($des[$idkey]) ? (is_array($des[$idkey]) ? \Drupal::service('renderer')->renderRoot($des[$idkey]) : $des[$idkey]) : '';
+            $rendered_des = ($need_des && isset($des[$idkey])) ? (is_array($des[$idkey]) ? \Drupal::service('renderer')->renderRoot($des[$idkey]) : $des[$idkey]) : '';
             $entry = [
               'title' => Xss::filter((string) $rendered_title, $title_allowed_tags),
               'id' => $idkey,
               'eid' => $entity_id,
               'url' => $link_url,
-              'des' => Xss::filterAdmin((string) $rendered_des),
+              'des' => $need_des ? Xss::filterAdmin((string) $rendered_des) : '',
             ];
             // Event duration.
             if (!empty($duration_field) && !empty($fields[$duration_field])) {
@@ -312,7 +349,7 @@ class FullcalendarViewPreprocess {
               }
 
               // A user who doesn't have the permission can't edit an event.
-              if (!$current_entity->access('update')) {
+              if ($is_anonymous || !$current_entity->access('update')) {
                 $entry['editable'] = FALSE;
               }
 

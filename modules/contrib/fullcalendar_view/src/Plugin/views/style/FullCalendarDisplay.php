@@ -781,6 +781,18 @@ class FullCalendarDisplay extends StylePluginBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    return [
+      '#theme' => $this->themeFunctions(),
+      '#view' => $this->view,
+      '#options' => $this->options,
+      '#rows' => [],
+    ];
+  }
+
+  /**
    * Builds the options form for Google Calendar settings.
    *
    * @param array $form
