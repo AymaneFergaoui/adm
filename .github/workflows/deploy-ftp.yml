@@ -21,8 +21,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          # Change to /www/ (or your FTP webroot folder on OVH)
-          server-dir: /www/
+          # OVH webroot folder (/home/caqtofg/adm/)
+          server-dir: /adm/
           # Never overwrite or delete production settings or uploaded files on FTP
           exclude: |
             **/.git*

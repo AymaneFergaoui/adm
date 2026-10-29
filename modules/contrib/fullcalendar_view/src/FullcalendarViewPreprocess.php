@@ -166,11 +166,23 @@ class FullcalendarViewPreprocess {
     // Set the first day setting.
     $first_day = isset($options['firstDay']) ? intval($options['firstDay']) : 0;
     // Left side buttons.
-    $left_buttons = Xss::filter($options['left_buttons']);
+    $left_buttons_raw = $options['left_buttons'] ?? '';
+    if (is_array($left_buttons_raw)) {
+      $left_buttons_raw = implode(',', array_filter(array_values($left_buttons_raw)));
+    }
+    $left_buttons = Xss::filter((string) $left_buttons_raw);
     // Right side buttons.
-    $right_buttons = Xss::filter($options['right_buttons']);
+    $right_buttons_raw = $options['right_buttons'] ?? '';
+    if (is_array($right_buttons_raw)) {
+      $right_buttons_raw = implode(',', array_filter(array_values($right_buttons_raw)));
+    }
+    $right_buttons = Xss::filter((string) $right_buttons_raw);
     // Slot Duration.
-    $slot_duration = empty($options['slotDuration']) ? '00:30:00' : Xss::filter($options['slotDuration']);
+    $slot_duration_raw = $options['slotDuration'] ?? '';
+    if (is_array($slot_duration_raw)) {
+      $slot_duration_raw = implode(',', array_filter(array_values($slot_duration_raw)));
+    }
+    $slot_duration = empty($slot_duration_raw) ? '00:30:00' : Xss::filter((string) $slot_duration_raw);
     // Display time limit.
     $minTime = !empty($options['minTime']) ? $options['minTime'] : '00:00:00';
     $maxTime = !empty($options['maxTime']) ? $options['maxTime'] : '23:59:59';
@@ -260,11 +272,11 @@ class FullcalendarViewPreprocess {
             $idkey = $row->index . '-' . $i;
             $rendered_des = isset($des[$idkey]) ? (is_array($des[$idkey]) ? \Drupal::service('renderer')->renderRoot($des[$idkey]) : $des[$idkey]) : '';
             $entry = [
-              'title' => Xss::filter($title, $title_allowed_tags),
+              'title' => Xss::filter((string) $rendered_title, $title_allowed_tags),
               'id' => $idkey,
               'eid' => $entity_id,
               'url' => $link_url,
-              'des' => Xss::filterAdmin($rendered_des),
+              'des' => Xss::filterAdmin((string) $rendered_des),
             ];
             // Event duration.
             if (!empty($duration_field) && !empty($fields[$duration_field])) {

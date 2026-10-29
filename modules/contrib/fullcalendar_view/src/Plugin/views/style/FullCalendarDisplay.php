@@ -246,7 +246,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $form['left_buttons'] = [
       '#type' => 'textfield',
       '#fieldset' => 'display',
-      '#default_value' => (empty($this->options['left_buttons'])) ? [] : $this->options['left_buttons'],
+      '#default_value' => (empty($this->options['left_buttons']) || is_array($this->options['left_buttons'])) ? '' : (string) $this->options['left_buttons'],
       '#title' => $this->t('Left side buttons'),
       '#description' => $this->t(
         'Left side buttons. Buttons are separated by commas or space. See the %fullcalendar_doc for available buttons.',
