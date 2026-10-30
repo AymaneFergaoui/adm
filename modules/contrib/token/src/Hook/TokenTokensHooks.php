@@ -59,9 +59,10 @@ final class TokenTokensHooks {
     protected RequestStack $requestStack,
     protected ConfigFactoryInterface $configFactory,
     protected ImageFactory $imageFactory,
-    protected ?AliasManagerInterface $aliasManager,
-    protected TitleResolverInterface $titleResolver,
-    protected CurrentPathStack $currentPathStack,
+    protected ?AliasManagerInterface $aliasManager = NULL,
+    protected ?TitleResolverInterface $titleResolver = NULL,
+    protected ?CurrentPathStack $currentPathStack = NULL,
+    mixed ...$extra,
   ) {
   }
 
