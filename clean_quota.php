@@ -47,7 +47,11 @@ try {
     ORDER BY (data_length + index_length) DESC LIMIT 20")->fetchAll();
 
   foreach ($tables as $t) {
-    echo sprintf("%-35s %10s MB (%s rows)\n", $t->table_name, $t->size_mb, $t->table_rows);
+    $t_arr = (array) $t;
+    $name = $t_arr['table_name'] ?? $t_arr['TABLE_NAME'] ?? 'unknown';
+    $mb = $t_arr['size_mb'] ?? $t_arr['SIZE_MB'] ?? 0;
+    $rows = $t_arr['table_rows'] ?? $t_arr['TABLE_ROWS'] ?? 0;
+    echo sprintf("%-40s %10s MB (%s rows)\n", $name, $mb, $rows);
   }
 
   // Cleanup action if requested
