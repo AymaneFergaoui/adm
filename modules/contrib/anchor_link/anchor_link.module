@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains anchor_link.module.
+ * Contains anchor_link.module (stable 8.x-2.7).
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
