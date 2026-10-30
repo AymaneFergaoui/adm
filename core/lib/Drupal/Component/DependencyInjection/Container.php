@@ -151,6 +151,14 @@ class Container implements ContainerInterface, ResetInterface {
 
     $definition = $this->serviceDefinitions[$id] ?? NULL;
 
+    if (!$definition && str_contains($id, '\\Hook\\') && class_exists($id)) {
+      try {
+        return $this->services[$id] = new $id();
+      }
+      catch (\Throwable $e) {
+      }
+    }
+
     if (!$definition && $invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
       if (!$id) {
         throw new ServiceNotFoundException('');
