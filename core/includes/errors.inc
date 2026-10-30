@@ -263,6 +263,9 @@ function _drupal_log_error($error, $fatal = FALSE) {
       // We fallback to a maintenance page at this point, because the page generation
       // itself can generate errors.
       // Should not translate the string to avoid errors producing more errors.
+      if (!empty($_GET['debug_err'])) {
+        $message .= '<pre>' . htmlspecialchars(($error['%type'] ?? '') . ': ' . ($error['@message'] ?? '') . ' in ' . ($error['%file'] ?? '') . ':' . ($error['%line'] ?? '') . "\n" . ($error['@backtrace_string'] ?? '')) . '</pre>';
+      }
       $message = 'The website encountered an unexpected error. Try again later.' . '<br />' . $message;
 
       if ($is_installer) {
