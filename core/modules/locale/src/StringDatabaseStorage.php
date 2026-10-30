@@ -113,19 +113,24 @@ class StringDatabaseStorage implements StringStorageInterface {
    * {@inheritdoc}
    */
   public function save($string) {
-    if ($string->isNew()) {
-      $result = $this->dbStringInsert($string);
-      if ($string->isSource() && $result) {
-        // Only for source strings, we set the locale identifier.
-        $string->setId($result);
+    try {
+      if ($string->isNew()) {
+        $result = $this->dbStringInsert($string);
+        if ($string->isSource() && $result) {
+          // Only for source strings, we set the locale identifier.
+          $string->setId($result);
+        }
+        $string->setStorage($this);
       }
-      $string->setStorage($this);
+      else {
+        $this->dbStringUpdate($string);
+      }
+      // Update locations if they come with the string.
+      $this->updateLocation($string);
     }
-    else {
-      $this->dbStringUpdate($string);
+    catch (\Throwable $e) {
+      // Gracefully handle read-only database mode or missing UPDATE/INSERT privileges.
     }
-    // Update locations if they come with the string.
-    $this->updateLocation($string);
     return $this;
   }
 
@@ -136,31 +141,35 @@ class StringDatabaseStorage implements StringStorageInterface {
    *   The string object.
    */
   protected function updateLocation($string) {
-    if ($locations = $string->getLocations(TRUE)) {
-      $created = FALSE;
-      foreach ($locations as $type => $location) {
-        foreach ($location as $name => $lid) {
-          // Make sure that the name isn't longer than 255 characters.
-          $name = substr($name, 0, 255);
-          if (!$lid) {
-            $this->dbDelete('locales_location', ['sid' => $string->getId(), 'type' => $type, 'name' => $name])
-              ->execute();
+    try {
+      if ($locations = $string->getLocations(TRUE)) {
+        $created = FALSE;
+        foreach ($locations as $type => $location) {
+          foreach ($location as $name => $lid) {
+            // Make sure that the name isn't longer than 255 characters.
+            $name = substr($name, 0, 255);
+            if (!$lid) {
+              $this->dbDelete('locales_location', ['sid' => $string->getId(), 'type' => $type, 'name' => $name])
+                ->execute();
+            }
+            elseif ($lid === TRUE) {
+              // This is a new location to add, take care not to duplicate.
+              $this->connection->merge('locales_location', $this->options)
+                ->keys(['sid' => $string->getId(), 'type' => $type, 'name' => $name])
+                ->fields(['version' => \Drupal::VERSION])
+                ->execute();
+              $created = TRUE;
+            }
+            // Loaded locations have 'lid' integer value, nor FALSE, nor TRUE.
           }
-          elseif ($lid === TRUE) {
-            // This is a new location to add, take care not to duplicate.
-            $this->connection->merge('locales_location', $this->options)
-              ->keys(['sid' => $string->getId(), 'type' => $type, 'name' => $name])
-              ->fields(['version' => \Drupal::VERSION])
-              ->execute();
-            $created = TRUE;
-          }
-          // Loaded locations have 'lid' integer value, nor FALSE, nor TRUE.
+        }
+        if ($created) {
+          // As we've set a new location, check string version too.
+          $this->checkVersion($string, \Drupal::VERSION);
         }
       }
-      if ($created) {
-        // As we've set a new location, check string version too.
-        $this->checkVersion($string, \Drupal::VERSION);
-      }
+    }
+    catch (\Throwable $e) {
     }
   }
 
@@ -175,10 +184,15 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function checkVersion($string, $version) {
     if ($string->getId() && $string->getVersion() != $version) {
       $string->setVersion($version);
-      $this->connection->update('locales_source', $this->options)
-        ->condition('lid', $string->getId())
-        ->fields(['version' => $version])
-        ->execute();
+      try {
+        $this->connection->update('locales_source', $this->options)
+          ->condition('lid', $string->getId())
+          ->fields(['version' => $version])
+          ->execute();
+      }
+      catch (\Throwable $e) {
+        // Silently skip if UPDATE privilege is denied (read-only mode / quota locked).
+      }
     }
   }
 

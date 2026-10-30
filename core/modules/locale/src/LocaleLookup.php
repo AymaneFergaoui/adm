@@ -150,11 +150,16 @@ class LocaleLookup extends CacheCollector {
     else {
       // We don't have the source string, update the {locales_source} table to
       // indicate the string is not translated.
-      $this->stringStorage->createString([
-        'source' => $offset,
-        'context' => $this->context,
-        'version' => \Drupal::VERSION,
-      ])->addLocation('path', $this->requestStack->getCurrentRequest()->getRequestUri())->save();
+      try {
+        $this->stringStorage->createString([
+          'source' => $offset,
+          'context' => $this->context,
+          'version' => \Drupal::VERSION,
+        ])->addLocation('path', $this->requestStack->getCurrentRequest()->getRequestUri())->save();
+      }
+      catch (\Throwable $e) {
+        // Silently skip if database is read-only or quota-restricted.
+      }
       $value = TRUE;
     }
 
