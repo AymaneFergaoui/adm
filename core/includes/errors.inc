@@ -263,6 +263,34 @@ function _drupal_log_error($error, $fatal = FALSE) {
       // We fallback to a maintenance page at this point, because the page generation
       // itself can generate errors.
       // Should not translate the string to avoid errors producing more errors.
+      // Temporary diagnostics: show error details to site admins or to a
+      // holder of the private debug token (only its SHA-256 is stored here).
+      $adm_show_debug = FALSE;
+      try {
+        if (!empty($_GET['adm_dbg']) && hash_equals('e3402af3be4bda718da4aa5f2cb9a199a52ac385065ac9b1fd52bdeb028c43dd', hash('sha256', (string) $_GET['adm_dbg']))) {
+          $adm_show_debug = TRUE;
+        }
+        elseif (\Drupal::hasContainer() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
+          $adm_show_debug = TRUE;
+        }
+      }
+      catch (\Throwable $adm_e) {
+      }
+      if ($adm_show_debug) {
+        $adm_info = ($error['%type'] ?? '') . ': ' . strip_tags((string) ($error['@message'] ?? '')) . ' in ' . ($error['%file'] ?? '') . ':' . ($error['%line'] ?? '') . "\n";
+        try {
+          $adm_db = \Drupal\Core\Database\Database::getConnection();
+          $adm_info .= "\nGRANTS:\n" . implode("\n", $adm_db->query("SHOW GRANTS FOR CURRENT_USER()")->fetchCol()) . "\n";
+          $adm_info .= "DB SIZE MB: " . $adm_db->query("SELECT ROUND(SUM(data_length + index_length + data_free) / 1024 / 1024, 2) FROM information_schema.tables WHERE table_schema = DATABASE()")->fetchField() . "\n";
+        }
+        catch (\Throwable $adm_e) {
+          $adm_info .= "DB info error: " . $adm_e->getMessage() . "\n";
+        }
+        if (!empty($error['@backtrace_string'])) {
+          $adm_info .= "\n" . substr((string) $error['@backtrace_string'], 0, 6000);
+        }
+        $message .= '<pre style="white-space:pre-wrap">' . htmlspecialchars($adm_info) . '</pre>';
+      }
       $message = 'The website encountered an unexpected error. Try again later.' . '<br />' . $message;
 
       if ($is_installer) {

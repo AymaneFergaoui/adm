@@ -71,6 +71,27 @@ function antibot_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 
     $protection = $included && !$excluded;
 
+    // Webform submission forms that already contain a CAPTCHA/reCAPTCHA
+    // element are protected by it. Antibot on top of reCAPTCHA blocks real
+    // members (touch devices, autofill, clicks without mouse movement), so
+    // skip Antibot for those forms.
+    if ($protection && str_starts_with((string) $form_id, 'webform_submission_')) {
+      try {
+        $form_object = $form_state->getFormObject();
+        if (method_exists($form_object, 'getEntity') && ($submission = $form_object->getEntity()) && method_exists($submission, 'getWebform') && ($webform = $submission->getWebform())) {
+          foreach ($webform->getElementsDecodedAndFlattened() as $element) {
+            if (isset($element['#type']) && $element['#type'] === 'captcha') {
+              $protection = FALSE;
+              break;
+            }
+          }
+        }
+      }
+      catch (\Throwable $e) {
+        // Keep the default protection on error.
+      }
+    }
+
     // Other modules can change the protection of this form.
     \Drupal::moduleHandler()->alter('antibot_form_status', $form_id, $protection);
 

@@ -4,75 +4,107 @@
  *
  * This works by resetting the form action to the path that It should be as well
  * as injecting the secret form key, only if the current user is verified to be
- * human which is done by waiting for a mousemove, swipe, or tab/enter key to be
- * pressed.
+ * human which is done by waiting for a user interaction (mouse, touch,
+ * keyboard, focus, click) or, at the latest, when the form is submitted by a
+ * real browser with JavaScript enabled.
  */
 
 ((Drupal, drupalSettings) => {
   drupalSettings.antibot = drupalSettings.antibot || {};
-  Drupal.antibot = {};
+  Drupal.antibot = Drupal.antibot || {};
 
-  Drupal.behaviors.antibot = {
-    attach(context, settings) {
-      drupalSettings = settings;
-      // Assume the user is not human, despite JS being enabled.
-      if (typeof drupalSettings.antibot !== 'undefined') {
-        drupalSettings.antibot.human = false;
-      }
-
-      // Wait for a mouse to move, indicating they are human.
-      document.body.addEventListener('mousemove', () => {
-        // Unlock the forms.
-        Drupal.antibot.unlockForms();
-      });
-
-      // Wait for a touch move event, indicating that they are human.
-      document.body.addEventListener('touchmove', () => {
-        // Unlock the forms.
-        Drupal.antibot.unlockForms();
-      });
-
-      // A tab or enter key pressed can also indicate they are human.
-      document.body.addEventListener('keydown', (e) => {
-        if (e.code === 'Tab' || e.code === 'Enter') {
-          // Unlock the forms.
-          Drupal.antibot.unlockForms();
-        }
-      });
-    },
+  /**
+   * Unlocks a single form element using its antibot config.
+   */
+  Drupal.antibot.unlockForm = (config) => {
+    const form = document.getElementById(config.id);
+    if (!form) {
+      return;
+    }
+    const action = form.getAttribute('data-action');
+    if (action) {
+      form.setAttribute('action', action);
+    }
+    const input = form.querySelector('input[name="antibot_key"]');
+    if (input && config.key) {
+      input.value = config.key
+        .split('')
+        .reverse()
+        .join('')
+        .match(/.{1,2}/g)
+        .map((value) => value.split('').reverse().join(''))
+        .join('');
+    }
   };
 
   /**
    * Unlock all locked forms.
    */
   Drupal.antibot.unlockForms = () => {
-    // Act only if we haven't yet verified this user as being human.
-    if (!drupalSettings.antibot.human) {
-      // Check if there are forms to unlock.
-      if (drupalSettings.antibot.forms !== undefined) {
-        // Iterate all antibot forms that we need to unlock.
-        Object.values(drupalSettings.antibot.forms).forEach((config) => {
-          // Switch the action.
-          const form = document.getElementById(config.id);
-          if (form) {
-            form.setAttribute('action', form.getAttribute('data-action'));
-
-            // Set the key.
-            const input = form.querySelector('input[name="antibot_key"]');
-            if (input) {
-              input.value = config.key
-                .split('')
-                .reverse()
-                .join('')
-                .match(/.{1,2}/g)
-                .map((value) => value.split('').reverse().join(''))
-                .join('');
-            }
-          }
-        });
-      }
-      // Mark this user as being human.
-      drupalSettings.antibot.human = true;
+    if (drupalSettings.antibot && drupalSettings.antibot.forms !== undefined) {
+      Object.values(drupalSettings.antibot.forms).forEach((config) => {
+        Drupal.antibot.unlockForm(config);
+      });
     }
+    drupalSettings.antibot.human = true;
+  };
+
+  let listenersAdded = false;
+
+  Drupal.behaviors.antibot = {
+    attach(context, settings) {
+      drupalSettings = settings;
+      drupalSettings.antibot = drupalSettings.antibot || {};
+
+      // If the visitor was already verified (e.g. forms added via AJAX),
+      // unlock the new forms immediately.
+      if (drupalSettings.antibot.human) {
+        Drupal.antibot.unlockForms();
+      }
+
+      if (listenersAdded) {
+        return;
+      }
+      listenersAdded = true;
+
+      const unlock = () => Drupal.antibot.unlockForms();
+      const opts = { passive: true, capture: true };
+      [
+        'mousemove',
+        'mousedown',
+        'pointerdown',
+        'touchstart',
+        'touchmove',
+        'click',
+        'focusin',
+        'input',
+        'change',
+        'wheel',
+        'scroll',
+      ].forEach((evt) => {
+        document.addEventListener(evt, unlock, opts);
+      });
+      document.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.code === 'Tab' || e.code === 'Enter' || e.key) {
+            unlock();
+          }
+        },
+        opts,
+      );
+
+      // Last line of defence: unlock right before a real submit.
+      document.addEventListener(
+        'submit',
+        (e) => {
+          const form = e.target;
+          if (form && form.classList && form.classList.contains('antibot')) {
+            Drupal.antibot.unlockForms();
+          }
+        },
+        true,
+      );
+    },
   };
 })(Drupal, drupalSettings);
