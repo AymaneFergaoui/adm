@@ -73,14 +73,17 @@ try {
     ];
 
     foreach ($cleanup_tables as $tbl) {
+      $cBefore = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
       try {
         $db->query("TRUNCATE TABLE `{$tbl}`");
-        echo "TRUNCATE on {$tbl}: OK\n";
+        $cAfter = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
+        echo "TRUNCATE on {$tbl}: before={$cBefore}, after={$cAfter}\n";
       }
       catch (\Throwable $e1) {
         try {
           $count = $db->query("DELETE FROM `{$tbl}`")->rowCount();
-          echo "DELETE on {$tbl} ({$count} rows): OK (Truncate failed: " . $e1->getMessage() . ")\n";
+          $cAfter = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
+          echo "DELETE on {$tbl}: before={$cBefore}, after={$cAfter} (Truncate err: " . $e1->getMessage() . ")\n";
         }
         catch (\Throwable $e2) {
           echo "Error on {$tbl}: " . $e2->getMessage() . "\n";
