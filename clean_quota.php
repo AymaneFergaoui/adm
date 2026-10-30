@@ -16,7 +16,7 @@ $autoloader = require_once __DIR__ . '/autoload.php';
 try {
   $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
   \Drupal\Core\DrupalKernel::bootEnvironment();
-  \Drupal\Core\Site\Settings::initialize(dirname(__DIR__), \Drupal\Core\DrupalKernel::findSitePath($request), $autoloader);
+  \Drupal\Core\Site\Settings::initialize(__DIR__, \Drupal\Core\DrupalKernel::findSitePath($request), $autoloader);
 
   $db = \Drupal\Core\Database\Database::getConnection();
 
