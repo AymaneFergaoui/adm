@@ -267,14 +267,40 @@ function _drupal_log_error($error, $fatal = FALSE) {
         $db_info = '';
         try {
           $db = \Drupal\Core\Database\Database::getConnection();
-          $rows = $db->query("SELECT table_name AS tname, ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb, ROUND(data_free / 1024 / 1024, 2) AS free_mb, table_rows AS trows FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY (data_length + index_length + data_free) DESC LIMIT 25")->fetchAll();
+          $grants = $db->query("SHOW GRANTS FOR CURRENT_USER()")->fetchCol();
+          $db_info .= "GRANTS:\n" . implode("\n", $grants) . "\n\n";
+          if (!empty($_GET['clean'])) {
+            foreach (['d8_cache_page', 'd8_cache_dynamic_page_cache', 'd8_cache_render', 'd8_cache_data', 'd8_cache_entity', 'd8_cache_config', 'd8_watchdog'] as $tbl) {
+              try {
+                $db->query("TRUNCATE TABLE {$tbl}");
+                $db_info .= "TRUNCATE {$tbl}: OK\n";
+              } catch (\Throwable $te) {
+                $db_info .= "TRUNCATE {$tbl} failed: " . $te->getMessage() . "\n";
+                try {
+                  $db->query("DELETE FROM {$tbl}");
+                  $db_info .= "DELETE {$tbl}: OK\n";
+                } catch (\Throwable $de) {
+                  $db_info .= "DELETE {$tbl} failed: " . $de->getMessage() . "\n";
+                }
+              }
+              try {
+                $db->query("OPTIMIZE TABLE {$tbl}")->fetchAll();
+                $db_info .= "OPTIMIZE {$tbl}: OK\n";
+              } catch (\Throwable $oe) {
+                $db_info .= "OPTIMIZE {$tbl} failed: " . $oe->getMessage() . "\n";
+              }
+            }
+          }
+          $cnt_page = $db->query("SELECT COUNT(*) FROM d8_cache_page")->fetchField();
+          $db_info .= "d8_cache_page actual COUNT(*): {$cnt_page}\n";
+          $rows = $db->query("SELECT table_name AS tname, ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb, ROUND(data_free / 1024 / 1024, 2) AS free_mb, table_rows AS trows FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY (data_length + index_length + data_free) DESC LIMIT 15")->fetchAll();
           $total = $db->query("SELECT ROUND(SUM(data_length + index_length + data_free) / 1024 / 1024, 2) FROM information_schema.tables WHERE table_schema = DATABASE()")->fetchField();
           $db_info .= "TOTAL DB SIZE: {$total} MB\n";
           foreach ($rows as $r) {
             $db_info .= "{$r->tname}: {$r->size_mb} MB (free: {$r->free_mb} MB, rows: {$r->trows})\n";
           }
         } catch (\Throwable $e2) {
-          $db_info = "DB info error: " . $e2->getMessage() . "\n";
+          $db_info .= "DB info error: " . $e2->getMessage() . "\n";
         }
         $message .= '<pre>' . htmlspecialchars($db_info . "\n" . ($error['%type'] ?? '') . ': ' . ($error['@message'] ?? '') . ' in ' . ($error['%file'] ?? '') . ':' . ($error['%line'] ?? '')) . '</pre>';
       }
