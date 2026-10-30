@@ -75,19 +75,11 @@ try {
     foreach ($cleanup_tables as $tbl) {
       $cBefore = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
       try {
-        $db->query("TRUNCATE TABLE `{$tbl}`");
-        $cAfter = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
-        echo "TRUNCATE on {$tbl}: before={$cBefore}, after={$cAfter}\n";
+        $opt = $db->query("OPTIMIZE TABLE `{$tbl}`")->fetchAll();
+        echo "OPTIMIZE on {$tbl}: " . json_encode($opt) . "\n";
       }
       catch (\Throwable $e1) {
-        try {
-          $count = $db->query("DELETE FROM `{$tbl}`")->rowCount();
-          $cAfter = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
-          echo "DELETE on {$tbl}: before={$cBefore}, after={$cAfter} (Truncate err: " . $e1->getMessage() . ")\n";
-        }
-        catch (\Throwable $e2) {
-          echo "Error on {$tbl}: " . $e2->getMessage() . "\n";
-        }
+        echo "OPTIMIZE err on {$tbl}: " . $e1->getMessage() . "\n";
       }
     }
 
