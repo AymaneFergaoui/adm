@@ -73,13 +73,12 @@ try {
     ];
 
     foreach ($cleanup_tables as $tbl) {
-      $cBefore = $db->query("SELECT COUNT(*) FROM `{$tbl}`")->fetchField();
       try {
-        $opt = $db->query("OPTIMIZE TABLE `{$tbl}`")->fetchAll();
-        echo "OPTIMIZE on {$tbl}: " . json_encode($opt) . "\n";
+        $db->query("ANALYZE TABLE `{$tbl}`");
+        echo "ANALYZE on {$tbl}: OK\n";
       }
       catch (\Throwable $e1) {
-        echo "OPTIMIZE err on {$tbl}: " . $e1->getMessage() . "\n";
+        echo "ANALYZE err on {$tbl}: " . $e1->getMessage() . "\n";
       }
     }
 
