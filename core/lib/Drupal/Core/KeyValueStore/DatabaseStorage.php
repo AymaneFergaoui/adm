@@ -146,10 +146,11 @@ class DatabaseStorage extends StorageBase {
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
       if ($this->ensureTableExists()) {
-        $this->doSet($key, $value);
-      }
-      else {
-        throw $e;
+        try {
+          $this->doSet($key, $value);
+        }
+        catch (\Exception $e2) {
+        }
       }
     }
   }

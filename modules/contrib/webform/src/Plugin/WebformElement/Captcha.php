@@ -109,7 +109,7 @@ class Captcha extends WebformElementBase {
     }
 
     // Always enable admin mode for test.
-    $is_test = str_contains($this->routeMatch->getRouteName(), '.webform.test_form');
+    $is_test = str_contains((string) $this->routeMatch->getRouteName(), '.webform.test_form');
     if ($is_test) {
       $element['#captcha_admin_mode'] = TRUE;
     }

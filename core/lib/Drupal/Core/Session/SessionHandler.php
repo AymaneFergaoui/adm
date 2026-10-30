@@ -63,14 +63,19 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
   public function read(#[\SensitiveParameter] string $sid): string|false {
     $data = '';
     if (!empty($sid)) {
+      $hashed_sid = Crypt::hashBase64($sid);
+      $fallback_file = DRUPAL_ROOT . '/sites/default/files/php/sessions/sess_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $hashed_sid);
       try {
         // Read the session data from the database.
         $query = $this->connection
-          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sid)]);
+          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => $hashed_sid]);
         $data = (string) $query->fetchField();
       }
       // Swallow the error if the table hasn't been created yet.
       catch (\Exception) {
+      }
+      if ($data === '' && is_file($fallback_file)) {
+        $data = (string) @file_get_contents($fallback_file);
       }
     }
     return $data;
@@ -81,6 +86,9 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
    */
   public function write(#[\SensitiveParameter] string $sid, string $value): bool {
     $try_again = FALSE;
+    $hashed_sid = Crypt::hashBase64($sid);
+    $fallback_dir = DRUPAL_ROOT . '/sites/default/files/php/sessions';
+    $fallback_file = $fallback_dir . '/sess_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $hashed_sid);
     $request = $this->requestStack->getCurrentRequest();
     $fields = [
       'uid' => $request->getSession()->get('uid', 0),
@@ -90,23 +98,36 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
     ];
     $doWrite = fn() =>
       $this->connection->merge('sessions')
-        ->keys(['sid' => Crypt::hashBase64($sid)])
+        ->keys(['sid' => $hashed_sid])
         ->fields($fields)
         ->execute();
     try {
       $doWrite();
+      if (is_file($fallback_file)) {
+        @unlink($fallback_file);
+      }
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
       if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing
-        // table, propagate the exception.
-        throw $e;
+        if (!is_dir($fallback_dir)) {
+          @mkdir($fallback_dir, 0775, TRUE);
+        }
+        @file_put_contents($fallback_file, $value);
+        return TRUE;
       }
     }
     // Now that the bin has been created, try again if necessary.
     if ($try_again) {
-      $doWrite();
+      try {
+        $doWrite();
+      }
+      catch (\Exception $e) {
+        if (!is_dir($fallback_dir)) {
+          @mkdir($fallback_dir, 0775, TRUE);
+        }
+        @file_put_contents($fallback_file, $value);
+      }
     }
 
     return TRUE;
@@ -123,10 +144,15 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
    * {@inheritdoc}
    */
   public function destroy(#[\SensitiveParameter] string $sid): bool {
+    $hashed_sid = Crypt::hashBase64($sid);
+    $fallback_file = DRUPAL_ROOT . '/sites/default/files/php/sessions/sess_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $hashed_sid);
+    if (is_file($fallback_file)) {
+      @unlink($fallback_file);
+    }
     try {
       // Delete session data.
       $this->connection->delete('sessions')
-        ->condition('sid', Crypt::hashBase64($sid))
+        ->condition('sid', $hashed_sid)
         ->execute();
     }
     // Swallow the error if the table hasn't been created yet.

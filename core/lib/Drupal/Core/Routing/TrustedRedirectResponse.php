@@ -23,7 +23,7 @@ class TrustedRedirectResponse extends CacheableSecuredRedirectResponse {
    */
   public function __construct($url, $status = 302, $headers = []) {
     $this->trustedUrls[$url] = TRUE;
-    parent::__construct($url, $status, $headers);
+    parent::__construct($url, (int) ($status ?? 302), $headers);
   }
 
   /**

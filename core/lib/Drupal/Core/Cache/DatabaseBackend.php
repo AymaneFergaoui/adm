@@ -221,6 +221,9 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
+    if (in_array($this->bin, ['cache_page', 'cache_dynamic_page_cache', 'page', 'dynamic_page_cache'], TRUE)) {
+      return;
+    }
     $try_again = FALSE;
     try {
       // The bin might not yet exist.
@@ -229,14 +232,18 @@ class DatabaseBackend implements CacheBackendInterface {
     catch (\Exception $e) {
       // If there was an exception, try to create the bins.
       if (!$try_again = $this->ensureBinExists()) {
-        // If the exception happened for other reason than the missing bin
-        // table, propagate the exception.
-        throw $e;
+        // Silently ignore database write/quota errors on cache tables.
+        return;
       }
     }
     // Now that the bin has been created, try again if necessary.
     if ($try_again) {
-      $this->doSetMultiple($items);
+      try {
+        $this->doSetMultiple($items);
+      }
+      catch (\Exception $e) {
+        return;
+      }
     }
   }
 

@@ -89,19 +89,24 @@ function _captcha_generate_captcha_session($form_id = NULL, $status = CaptchaCon
 
   // Insert an entry and thankfully receive the value
   // of the autoincrement field 'csid'.
-  $captcha_sid = \Drupal::database()->insert('captcha_sessions')
-    ->fields([
-      'uid' => $user->id(),
-      'sid' => session_id(),
-      'ip_address' => \Drupal::request()->getClientIp(),
-      'timestamp' => \Drupal::time()->getRequestTime(),
-      'form_id' => $form_id,
-      'solution' => $solution,
-      'status' => $status,
-      'attempts' => 0,
-    ])
-    ->execute();
-  return $captcha_sid;
+  try {
+    $captcha_sid = \Drupal::database()->insert('captcha_sessions')
+      ->fields([
+        'uid' => $user->id(),
+        'sid' => session_id(),
+        'ip_address' => \Drupal::request()->getClientIp(),
+        'timestamp' => \Drupal::time()->getRequestTime(),
+        'form_id' => $form_id,
+        'solution' => $solution,
+        'status' => $status,
+        'attempts' => 0,
+      ])
+      ->execute();
+    return $captcha_sid;
+  }
+  catch (\Exception $e) {
+    return mt_rand(1000000, 9999999);
+  }
 }
 
 /**
@@ -113,14 +118,18 @@ function _captcha_generate_captcha_session($form_id = NULL, $status = CaptchaCon
  *   The new solution to associate with the given CAPTCHA session.
  */
 function _captcha_update_captcha_session($captcha_sid, $solution) {
-  \Drupal::database()->update('captcha_sessions')
-    ->condition('csid', $captcha_sid)
-    ->fields([
-      'timestamp' => \Drupal::time()->getRequestTime(),
-      'solution' => $solution,
-      'status' => CaptchaConstants::CAPTCHA_STATUS_UNSOLVED,
-    ])
-    ->execute();
+  try {
+    \Drupal::database()->update('captcha_sessions')
+      ->condition('csid', $captcha_sid)
+      ->fields([
+        'timestamp' => \Drupal::time()->getRequestTime(),
+        'solution' => $solution,
+        'status' => CaptchaConstants::CAPTCHA_STATUS_UNSOLVED,
+      ])
+      ->execute();
+  }
+  catch (\Exception $e) {
+  }
 }
 
 /**

@@ -100,10 +100,15 @@ class DbLog implements LoggerInterface {
         Database::addConnectionInfo($key, self::DEDICATED_DBLOG_CONNECTION_TARGET, $info['default']);
         $this->connection = Database::getConnection(self::DEDICATED_DBLOG_CONNECTION_TARGET, $key);
         // Now try once to log the error again.
-        $this->log($level, $message, $context);
+        try {
+          $this->log($level, $message, $context);
+        }
+        catch (\Exception $e2) {
+          // Silently ignore if watchdog table is not writable (e.g. quota lock).
+        }
       }
       else {
-        throw $e;
+        // Silently ignore if watchdog table is not writable (e.g. quota lock).
       }
     }
   }

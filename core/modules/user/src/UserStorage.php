@@ -42,26 +42,36 @@ class UserStorage extends SqlContentEntityStorage implements UserStorageInterfac
    * {@inheritdoc}
    */
   public function updateLastLoginTimestamp(UserInterface $account) {
-    $this->database->update($this->getDataTable())
-      ->fields(['login' => $account->getLastLoginTime()])
-      ->condition('uid', $account->id())
-      ->execute();
-    // Ensure that the entity cache is cleared.
-    $this->resetCache([$account->id()]);
+    try {
+      $this->database->update($this->getDataTable())
+        ->fields(['login' => $account->getLastLoginTime()])
+        ->condition('uid', $account->id())
+        ->execute();
+      // Ensure that the entity cache is cleared.
+      $this->resetCache([$account->id()]);
+    }
+    catch (\Exception $e) {
+      // Ignore if DB update is denied by quota.
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function updateLastAccessTimestamp(AccountInterface $account, $timestamp) {
-    $this->database->update($this->getDataTable())
-      ->fields([
-        'access' => $timestamp,
-      ])
-      ->condition('uid', $account->id())
-      ->execute();
-    // Ensure that the entity cache is cleared.
-    $this->resetCache([$account->id()]);
+    try {
+      $this->database->update($this->getDataTable())
+        ->fields([
+          'access' => $timestamp,
+        ])
+        ->condition('uid', $account->id())
+        ->execute();
+      // Ensure that the entity cache is cleared.
+      $this->resetCache([$account->id()]);
+    }
+    catch (\Exception $e) {
+      // Ignore if DB update is denied by quota.
+    }
   }
 
   /**

@@ -437,7 +437,7 @@ function _captcha_get_posted_captcha_info(array $element, FormStateInterface $fo
       // the posted CAPTCHA token and session ID: it is a bit more stringent
       // and the database query should also be more efficient (because there is
       // an index on the CAPTCHA session ID).
-      if ($posted_captcha_sid != NULL) {
+      if ($posted_captcha_sid != NULL && empty($input['captcha_cacheable'])) {
         $expected_captcha_token = \Drupal::database()
           ->select('captcha_sessions', 'cs')
           ->fields('cs', ['token'])

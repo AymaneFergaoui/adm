@@ -117,10 +117,14 @@ class Captcha extends FormElement implements ContainerFactoryPluginInterface {
       // not reuse one from a posted form.
       $captcha_sid = _captcha_generate_captcha_session($this_form_id, CaptchaConstants::CAPTCHA_STATUS_UNSOLVED);
       $captcha_token = Crypt::randomBytesBase64();
-      \Drupal::database()->update('captcha_sessions')
-        ->fields(['token' => $captcha_token])
-        ->condition('csid', $captcha_sid)
-        ->execute();
+      try {
+        \Drupal::database()->update('captcha_sessions')
+          ->fields(['token' => $captcha_token])
+          ->condition('csid', $captcha_sid)
+          ->execute();
+      }
+      catch (\Exception $e) {
+      }
     }
 
     // Store CAPTCHA session ID as hidden field.
@@ -134,12 +138,22 @@ class Captcha extends FormElement implements ContainerFactoryPluginInterface {
     ];
 
     // Store CAPTCHA token as hidden field.
-    $captcha_token = \Drupal::database()
-      ->select('captcha_sessions', 'cs')
-      ->fields('cs', ['token'])
-      ->condition('csid', $captcha_sid)
-      ->execute()
-      ->fetchField();
+    try {
+      $db_token = \Drupal::database()
+        ->select('captcha_sessions', 'cs')
+        ->fields('cs', ['token'])
+        ->condition('csid', $captcha_sid)
+        ->execute()
+        ->fetchField();
+      if ($db_token) {
+        $captcha_token = $db_token;
+      }
+    }
+    catch (\Exception $e) {
+    }
+    if (empty($captcha_token)) {
+      $captcha_token = Crypt::randomBytesBase64();
+    }
 
     $element['captcha_token'] = [
       '#type' => 'hidden',
@@ -295,10 +309,14 @@ class Captcha extends FormElement implements ContainerFactoryPluginInterface {
         ->get('persistence');
       if ($captcha_persistence == CaptchaConstants::CAPTCHA_PERSISTENCE_SHOW_ALWAYS) {
         $new_token = Crypt::randomBytesBase64();
-        \Drupal::database()->update('captcha_sessions')
-          ->fields(['token' => $new_token])
-          ->condition('csid', $captcha_sid)
-          ->execute();
+        try {
+          \Drupal::database()->update('captcha_sessions')
+            ->fields(['token' => $new_token])
+            ->condition('csid', $captcha_sid)
+            ->execute();
+        }
+        catch (\Exception $e) {
+        }
         $element['captcha_token']['#value'] = $new_token;
       }
 

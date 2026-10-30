@@ -65,11 +65,16 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     catch (\Exception $e) {
       $try_again = $this->ensureTableExists();
       if (!$try_again) {
-        throw $e;
+        return;
       }
     }
     if ($try_again) {
-      $this->doInsert($name, $window, $identifier);
+      try {
+        $this->doInsert($name, $window, $identifier);
+      }
+      catch (\Exception $e) {
+        return;
+      }
     }
   }
 

@@ -68,6 +68,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
+    $result = [];
     try {
       $values = $this->connection->query(
         'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
@@ -76,7 +77,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
           ':keys[]' => $keys,
           ':collection' => $this->collection,
         ])->fetchAllKeyed();
-      return array_map([$this->serializer, 'decode'], $values);
+      $result = array_map([$this->serializer, 'decode'], $values);
     }
     catch (\Exception $e) {
       // @todo Perhaps if the database is never going to be available,
@@ -85,7 +86,18 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
       // https://www.drupal.org/node/2787737
       $this->catchException($e);
     }
-    return [];
+    foreach ($keys as $key) {
+      if (!isset($result[$key])) {
+        $fb = DRUPAL_ROOT . '/sites/default/files/php/kv/' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $this->collection . '__' . $key);
+        if (is_file($fb)) {
+          $raw = @file_get_contents($fb);
+          if ($raw !== FALSE) {
+            $result[$key] = $this->serializer->decode($raw);
+          }
+        }
+      }
+    }
+    return $result;
   }
 
   /**
@@ -136,17 +148,28 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpire($key, $value, $expire) {
+    $fb_dir = DRUPAL_ROOT . '/sites/default/files/php/kv';
+    $fb = $fb_dir . '/' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $this->collection . '__' . $key);
     try {
       $this->doSetWithExpire($key, $value, $expire);
+      if (is_file($fb)) {
+        @unlink($fb);
+      }
     }
     catch (\Exception $e) {
       // If there was an exception, then try to create the table.
       if ($this->ensureTableExists()) {
-        $this->doSetWithExpire($key, $value, $expire);
+        try {
+          $this->doSetWithExpire($key, $value, $expire);
+          return;
+        }
+        catch (\Exception $e2) {
+        }
       }
-      else {
-        throw $e;
+      if (!is_dir($fb_dir)) {
+        @mkdir($fb_dir, 0775, TRUE);
       }
+      @file_put_contents($fb, $this->serializer->encode($value));
     }
   }
 

@@ -1,4 +1,5 @@
 recaptcha:
+  header: true
   js:
     js/recaptcha.js: {}
   dependencies:
