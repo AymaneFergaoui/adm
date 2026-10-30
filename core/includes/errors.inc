@@ -267,11 +267,11 @@ function _drupal_log_error($error, $fatal = FALSE) {
         $db_info = '';
         try {
           $db = \Drupal\Core\Database\Database::getConnection();
-          $rows = $db->query("SELECT table_name, ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb, ROUND(data_free / 1024 / 1024, 2) AS free_mb, table_rows FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY (data_length + index_length + data_free) DESC LIMIT 25")->fetchAll();
+          $rows = $db->query("SELECT table_name AS tname, ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb, ROUND(data_free / 1024 / 1024, 2) AS free_mb, table_rows AS trows FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY (data_length + index_length + data_free) DESC LIMIT 25")->fetchAll();
           $total = $db->query("SELECT ROUND(SUM(data_length + index_length + data_free) / 1024 / 1024, 2) FROM information_schema.tables WHERE table_schema = DATABASE()")->fetchField();
           $db_info .= "TOTAL DB SIZE: {$total} MB\n";
           foreach ($rows as $r) {
-            $db_info .= "{$r->table_name}: {$r->size_mb} MB (free: {$r->free_mb} MB, rows: {$r->table_rows})\n";
+            $db_info .= "{$r->tname}: {$r->size_mb} MB (free: {$r->free_mb} MB, rows: {$r->trows})\n";
           }
         } catch (\Throwable $e2) {
           $db_info = "DB info error: " . $e2->getMessage() . "\n";
