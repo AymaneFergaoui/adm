@@ -8,3 +8,6 @@ services:
   commerce_exchanger.import:
     class: Drupal\commerce_exchanger\DefaultExchangerImporter
     arguments: ['@entity_type.manager', '@state']
+  commerce_exchanger.manager:
+    class: Drupal\commerce_exchanger\ExchangerManager
+    arguments: ['@entity_type.manager', '@config.factory']

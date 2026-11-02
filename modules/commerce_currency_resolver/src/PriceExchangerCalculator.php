@@ -5,7 +5,7 @@ namespace Drupal\commerce_currency_resolver;
 use Drupal\commerce_exchanger\AbstractExchangerCalculator;
 
 /**
- * Class PriceExchangerCalculator.
+ * Class PriceExchangerCalculator (compatible with commerce_exchanger 1.x & 2.x).
  *
  * @package Drupal\commerce_currency_resolver
  */

@@ -1,3 +1,4 @@
+# Stable 8.x-1.61 services definition compatible with commerce_exchanger 1.x
 services:
   commerce_currency_resolver.current_currency:
     class: Drupal\commerce_currency_resolver\CurrentCurrency
