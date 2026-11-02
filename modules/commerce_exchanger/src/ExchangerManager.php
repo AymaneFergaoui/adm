@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 /**
  * Fallback ExchangerManager service for compatibility with commerce_exchanger 2.x.
  */
-class ExchangerManager {
+class ExchangerManager implements ExchangerManagerInterface {
 
   /**
    * Constructs an ExchangerManager object.
